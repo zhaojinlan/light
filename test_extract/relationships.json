@@ -1,0 +1,356 @@
+[
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "α相",
+    "relation_type": "has_phase",
+    "evidence": "艺术青铜的锡含量一般小于 20%，其组织为 α + (α + δ) 相。α 相是锡在铜中的固溶体，面心立方晶格。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "δ相",
+    "relation_type": "has_phase",
+    "evidence": "δ 相为复杂六方晶格的 Cu₃₁Sn₈ 金属间化合物，其共析分解十分缓慢，硬而脆，故能提高强度和耐磨性。"
+  },
+  {
+    "src_entity": "CuAl",
+    "tgt_entity": "γ相",
+    "relation_type": "has_phase",
+    "evidence": "合金中 Al 含量超过固溶极限后会出现 γ 相，它硬而脆，且会在 565℃以下温度发生缓冷脆裂，导致铸件裂纹。"
+  },
+  {
+    "src_entity": "CuAl",
+    "tgt_entity": "Al₂O₃",
+    "relation_type": "has_phase",
+    "evidence": "铝青铜与锡青铜相比有更多的优点：材料表面有一层可以自愈的 Al₂O₃ 保护膜。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "SnO₂",
+    "relation_type": "has_phase",
+    "evidence": "锡青铜耐蚀性优良，表面生成 SnO₂ 薄膜，能起很好的保护作用。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "缓冷脆裂",
+    "relation_type": "failure_mode_of",
+    "evidence": "而加入 Mn、Fe、Pb、Ni 可以抑制这种现象。"
+  },
+  {
+    "src_entity": "CuAl",
+    "tgt_entity": "缓冷脆裂",
+    "relation_type": "failure_mode_of",
+    "evidence": "γ 相...且会在 565℃以下温度发生缓冷脆裂，导致铸件裂纹。而加入 Mn、Fe、Pb、Ni 可以抑制这种现象。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "耐蚀性",
+    "relation_type": "has_property",
+    "evidence": "锡青铜耐蚀性优良，表面生成 SnO₂ 薄膜，能起很好的保护作用。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "耐磨性",
+    "relation_type": "has_property",
+    "evidence": "δ 相...硬而脆，故能提高强度和耐磨性。"
+  },
+  {
+    "src_entity": "CuAl",
+    "tgt_entity": "耐蚀性",
+    "relation_type": "has_property",
+    "evidence": "材料表面有一层可以自愈的 Al₂O₃ 保护膜，在大气和海洋环境中有很高的耐蚀性能。"
+  },
+  {
+    "src_entity": "CuAl",
+    "tgt_entity": "抗冲击性",
+    "relation_type": "has_property",
+    "evidence": "强度高、抗冲击，而且价格便宜。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu - Zn, Cu-Zn-Al, ..."
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu - Zn, Cu-Zn-Al, ..."
+  },
+  {
+    "src_entity": "Cu-Zn-Sn",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Zn-Sn, ..."
+  },
+  {
+    "src_entity": "Cu-Zn-Ni",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Zn-Ni, ..."
+  },
+  {
+    "src_entity": "Cu-Zn-Si",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Zn-Si, ..."
+  },
+  {
+    "src_entity": "Cu-Zn-Ga",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Zn-Ga, ..."
+  },
+  {
+    "src_entity": "Cu-Al",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Al, Cu-Al-Ni, ..."
+  },
+  {
+    "src_entity": "Cu-Al-Ni",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Al-Ni, ..."
+  },
+  {
+    "src_entity": "Cu-Al-Mn",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Al-Mn, ..."
+  },
+  {
+    "src_entity": "Cu-Al-Si",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Al-Si, ..."
+  },
+  {
+    "src_entity": "Cu-Al-Nb",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Al-Nb, ..."
+  },
+  {
+    "src_entity": "Cu-Al-Be",
+    "tgt_entity": "形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有：Cu-Al-Be, ..."
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "伪弹性",
+    "relation_type": "has_property",
+    "evidence": "图9-2表示超弹性的应力一应变曲线。曲线上部平台对应于应力作用下形成的马氏体，而曲线下部平台对应于应力消除时的马氏体可逆转变。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "伪弹性",
+    "relation_type": "has_property",
+    "evidence": "图9-2表示超弹性的应力一应变曲线。曲线上部平台对应于应力作用下形成的马氏体，而曲线下部平台对应于应力消除时的马氏体可逆转变。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "可恢复应变量",
+    "relation_type": "has_property",
+    "evidence": "它们的可恢复应变量达到 10% 以上。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "可恢复应变量",
+    "relation_type": "has_property",
+    "evidence": "它们的可恢复应变量达到 10% 以上。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "超弹性",
+    "relation_type": "has_property",
+    "evidence": "伪弹性也可称之为机械形状记忆效应。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "超弹性",
+    "relation_type": "has_property",
+    "evidence": "伪弹性也可称之为机械形状记忆效应。"
+  },
+  {
+    "src_entity": "Cu-Al-Ni",
+    "tgt_entity": "高阻尼",
+    "relation_type": "has_property",
+    "evidence": "铜基形状记忆合金具有形状记忆、超弹性、高阻尼和良好的导电性四大功能。"
+  },
+  {
+    "src_entity": "Cu-Al-Mn",
+    "tgt_entity": "高阻尼",
+    "relation_type": "has_property",
+    "evidence": "铜基形状记忆合金具有形状记忆、超弹性、高阻尼和良好的导电性四大功能。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "导电性",
+    "relation_type": "has_property",
+    "evidence": "铜基形状记忆合金具有形状记忆、超弹性、高阻尼和良好的导电性四大功能。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "导电性",
+    "relation_type": "has_property",
+    "evidence": "铜基形状记忆合金具有形状记忆、超弹性、高阻尼和良好的导电性四大功能。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "雕塑",
+    "relation_type": "used_in",
+    "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "乐器",
+    "relation_type": "used_in",
+    "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。"
+  },
+  {
+    "src_entity": "CuSn",
+    "tgt_entity": "钱币",
+    "relation_type": "used_in",
+    "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。"
+  },
+  {
+    "src_entity": "CuNi",
+    "tgt_entity": "钱币",
+    "relation_type": "used_in",
+    "evidence": "含20%左右的白铜常用来制造钱币和奖杯、奖牌，是白银的理想替代品。"
+  },
+  {
+    "src_entity": "CuNi",
+    "tgt_entity": "乐器",
+    "relation_type": "used_in",
+    "evidence": "加锌白铜最接近银色，具有很好的加工性能和耐蚀性，是选制餐具、乐器和装饰品的理想材料。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "热敏控制器",
+    "relation_type": "used_in",
+    "evidence": "SMAs 是一种热敏材料。它可以按环境条件选取适当的合金，控制其 Ms、Af 及变温范围，借助 SMAs 的形状记忆达到控温目的。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "自适应紧固件",
+    "relation_type": "used_in",
+    "evidence": "自动紧固件，即热收缩的管接头，使用方法是把制作好的记忆合金管接头...放在低温下贮存。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "自动调节装置",
+    "relation_type": "used_in",
+    "evidence": "铜基形状记忆合金已巧妙地应用于汽车的汽化器上。由 CuZnAl 合金制成一个简单的喷油嘴...正确控制燃料的流量。"
+  },
+  {
+    "src_entity": "Cu-Al-Ni",
+    "tgt_entity": "色调记忆配件",
+    "relation_type": "used_in",
+    "evidence": "含 12%~15% Al(质量分数)和 1%~5% Ni(质量分数)的铜合金是具有热弹性马氏体相变的色调记忆元件。"
+  },
+  {
+    "src_entity": "CuAlNiMnTi",
+    "tgt_entity": "弹性减振复合材料",
+    "relation_type": "used_in",
+    "evidence": "选用铍青铜作为高导电、高弹性组元与高减振的铜基形状记忆合金进行爆炸复合，可制成一种新型弹性减振复合材料。"
+  },
+  {
+    "src_entity": "Cu",
+    "tgt_entity": "CuZn",
+    "relation_type": "contains",
+    "evidence": "铜合金按照工艺方法可以分为铸造合金和变形合金两大类。而按照合金成分则可以分为紫铜、黄铜、青铜和白铜。"
+  },
+  {
+    "src_entity": "Cu",
+    "tgt_entity": "CuSn",
+    "relation_type": "contains",
+    "evidence": "铜合金按照工艺方法可以分为铸造合金和变形合金两大类。而按照合金成分则可以分为紫铜、黄铜、青铜和白铜。"
+  },
+  {
+    "src_entity": "Cu",
+    "tgt_entity": "CuNi",
+    "relation_type": "contains",
+    "evidence": "铜合金按照工艺方法可以分为铸造合金和变形合金两大类。而按照合金成分则可以分为紫铜、黄铜、青铜和白铜。"
+  },
+  {
+    "src_entity": "Cu",
+    "tgt_entity": "CuAl",
+    "relation_type": "contains",
+    "evidence": "铝青铜是铜基合金的一种，属于艺术用青铜的重要类别。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "马氏体",
+    "relation_type": "has_phase",
+    "evidence": "冷却时，在无应力条件下，马氏体在 Ms 开始形成。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "马氏体",
+    "relation_type": "has_phase",
+    "evidence": "冷却时，在无应力条件下，马氏体在 Ms 开始形成。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "应力诱发马氏体",
+    "relation_type": "has_phase",
+    "evidence": "若施加应力，马氏体可以在 Ms 以上温度形成，这种马氏体称为应力诱发马氏体（Stress-Induced Martensite，简称SIM）。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "应力诱发马氏体",
+    "relation_type": "has_phase",
+    "evidence": "若施加应力，马氏体可以在 Ms 以上温度形成，这种马氏体称为应力诱发马氏体（Stress-Induced Martensite，简称SIM）。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "奥氏体",
+    "relation_type": "has_phase",
+    "evidence": "再重新加热到 As 以上，马氏体发生逆转变，温度升至 Af 点，马氏体完全消失，材料完全恢复母相形状。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "奥氏体",
+    "relation_type": "has_phase",
+    "evidence": "再重新加热到 As 以上，马氏体发生逆转变，温度升至 Af 点，马氏体完全消失，材料完全恢复母相形状。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "单向形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "一般没有特殊说明，形状记忆效应都是指这种单向形状记忆效应。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "单向形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "一般没有特殊说明，形状记忆效应都是指这种单向形状记忆效应。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "双向形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "有些形状记忆合金在加热发生马氏体逆转变时，对母相有记忆效应；当从母相再次冷却为马氏体时，自觉回复原马氏体的形状，这种现象称为双向形状记忆效应。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "双向形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "有些形状记忆合金在加热发生马氏体逆转变时，对母相有记忆效应；当从母相再次冷却为马氏体时，自觉回复原马氏体的形状，这种现象称为双向形状记忆效应。"
+  },
+  {
+    "src_entity": "Cu-Zn",
+    "tgt_entity": "全方位形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "第三种情况是在 Ti-Ni 合金系中发现的，在冷热循环过程中，形状回复到与母相完全相反的形状，称为全方位形状记忆效应。"
+  },
+  {
+    "src_entity": "Cu-Zn-Al",
+    "tgt_entity": "全方位形状记忆效应",
+    "relation_type": "has_property",
+    "evidence": "第三种情况是在 Ti-Ni 合金系中发现的，在冷热循环过程中，形状回复到与母相完全相反的形状，称为全方位形状记忆效应。"
+  }
+]

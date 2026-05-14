@@ -1,0 +1,993 @@
+[
+  {
+    "entity_text": "紫铜",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu",
+    "aliases": [
+      "紫铜"
+    ],
+    "definition": "一种铜合金体系，具有古铜色，韧性好，焊接性能优良，常用于雕塑、人物雕像等艺术制品。",
+    "attributes": [
+      {
+        "key": "颜色",
+        "value": "古铜色"
+      },
+      {
+        "key": "典型用途",
+        "value": "雕塑、人物雕像、景泰蓝、镶嵌装饰品的胎坯、钱币、器皿、铜版画、大型浮雕"
+      },
+      {
+        "key": "特点",
+        "value": "朴实、大方、庄严，韧性好，焊接性能优良"
+      }
+    ],
+    "evidence": "紫铜具有古铜色，朴实、大方、庄严，韧性好，焊接性能优良，多用作雕塑、人物雕像。常用作铸造小型雕像、景泰蓝和镶嵌装饰品的胎坯、钱币和器皿。紫铜板可作铜版画、大型浮雕等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "黄铜",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "CuZn",
+    "aliases": [
+      "黄铜"
+    ],
+    "definition": "一种铜锌合金，呈金黄色，常用于饰品、乐器、钱币等艺术制品。",
+    "attributes": [
+      {
+        "key": "颜色",
+        "value": "华贵艳丽的金黄色"
+      },
+      {
+        "key": "典型用途",
+        "value": "饰品、金箔和金粉的替代品、艺术品、乐器、钱币"
+      },
+      {
+        "key": "特点",
+        "value": "富丽堂皇、高贵典雅"
+      }
+    ],
+    "evidence": "黄铜有华贵艳丽的金黄色，常用作饰品，富丽堂皇、高贵典雅。艺术黄铜色如黄金，常作金箔和金粉的替代品，得到广泛使用。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "青铜",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "CuSn",
+    "aliases": [
+      "青铜"
+    ],
+    "definition": "一种以铜锡为主的合金，具有青靛色，耐蚀性好，常用于器皿、雕塑等艺术制品。",
+    "attributes": [
+      {
+        "key": "颜色",
+        "value": "青靛色"
+      },
+      {
+        "key": "典型用途",
+        "value": "器皿、雕塑、佛像、钟、镜、鼓、钱币"
+      },
+      {
+        "key": "特点",
+        "value": "稳重耐久，耐蚀性好"
+      }
+    ],
+    "evidence": "青铜具有青靛色，耐蚀性好，用作器皿，稳重耐久。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "白铜",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "CuNi",
+    "aliases": [
+      "白铜"
+    ],
+    "definition": "一种铜镍合金，含5%~30% Ni，呈银白色，用于制造钱币、奖杯、餐具、乐器等。",
+    "attributes": [
+      {
+        "key": "化学成分范围",
+        "value": "5%~30% Ni"
+      },
+      {
+        "key": "颜色",
+        "value": "银白色"
+      },
+      {
+        "key": "典型用途",
+        "value": "钱币、奖杯、奖牌、餐具、乐器、装饰品"
+      },
+      {
+        "key": "特点",
+        "value": "光泽艳丽，硬度较高，刻印时磨耗少，易于加工"
+      }
+    ],
+    "evidence": "白铜(见第8章)是Cu-Ni系合金,一般含5%\\~30% Ni,色泽为银白色,光泽艳丽。含20%左右的白铜常用来制造钱币和奖杯、奖牌,是白银的理想替代品。这些合金硬度较高,刻印时磨耗少,易于加工。加锌白铜最接近银色,具有很好的加工性能和耐蚀性,是选制餐具、乐器和装饰品的理想材料。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "铝青铜",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "CuAl",
+    "aliases": [
+      "铝青铜"
+    ],
+    "definition": "一种铜铝合金，具有高耐蚀性、高强度和抗冲击性，常用于艺术雕塑和仿金材料。",
+    "attributes": [
+      {
+        "key": "典型用途",
+        "value": "艺术雕塑、仿金材料"
+      },
+      {
+        "key": "特点",
+        "value": "表面有自愈的Al₂O₃保护膜，大气和海洋环境中耐蚀性高，强度高，抗冲击，价格便宜"
+      }
+    ],
+    "evidence": "铝青铜与锡青铜相比有更多的优点:材料表面有一层可以自愈的 $Al_{2}O_{3}$ 保护膜,在大气和海洋环境中有很高的耐蚀性能。强度高、抗冲击,而且价格便宜。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "α相",
+    "entity_type": "Phase",
+    "normalized_name": "α相",
+    "aliases": [],
+    "definition": "锡在铜中的固溶体，具有面心立方晶格结构。",
+    "attributes": [
+      {
+        "key": "晶格结构",
+        "value": "面心立方晶格"
+      },
+      {
+        "key": "化学成分",
+        "value": "Sn在Cu中的固溶体"
+      },
+      {
+        "key": "特性",
+        "value": "单一α相易于着色"
+      },
+      {
+        "key": "形成条件",
+        "value": "锡含量低于5%时形成"
+      }
+    ],
+    "evidence": "α 相是锡在铜中的固溶体，面心立方晶格。……含 5% Sn 以下时为单一 α 相, 易于着色。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "δ相",
+    "entity_type": "Phase",
+    "normalized_name": "δ相",
+    "aliases": [],
+    "definition": "一种复杂六方晶格的金属间化合物Cu₃₁Sn₈，硬而脆，能提高锡青铜的强度和耐磨性。",
+    "attributes": [
+      {
+        "key": "晶格结构",
+        "value": "复杂六方晶格"
+      },
+      {
+        "key": "化学成分",
+        "value": "Cu₃₁Sn₈"
+      },
+      {
+        "key": "特性",
+        "value": "硬而脆，能提高强度和耐磨性"
+      },
+      {
+        "key": "形成条件",
+        "value": "砂型铸造时Sn含量为7%，金属型铸造时Sn含量为5%"
+      }
+    ],
+    "evidence": "δ 相为复杂六方晶格的 $Cu_{31}Sn_{8}$ 金属间化合物, 其共析分解十分缓慢, 硬而脆, 故能提高强度和耐磨性。砂型铸造时如果 Sn 含量为 7%、金属型铸造时如果 Sn 含量为 5%, 就会出现 δ 相。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Al2O3",
+    "entity_type": "Phase",
+    "normalized_name": "Al₂O₃",
+    "aliases": [
+      "Al2O3"
+    ],
+    "definition": "铝青铜表面形成的自愈保护膜，提高材料在大气和海洋环境中的耐蚀性。",
+    "attributes": [
+      {
+        "key": "特性",
+        "value": "可自愈的保护膜"
+      },
+      {
+        "key": "形成条件",
+        "value": "铝青铜暴露于大气或海洋环境中"
+      }
+    ],
+    "evidence": "材料表面有一层可以自愈的 $Al_{2}O_{3}$ 保护膜,在大气和海洋环境中有很高的耐蚀性能。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "SnO2",
+    "entity_type": "Phase",
+    "normalized_name": "SnO₂",
+    "aliases": [
+      "SnO2"
+    ],
+    "definition": "锡青铜表面生成的氧化膜，具有良好的保护作用，提高耐蚀性。",
+    "attributes": [
+      {
+        "key": "特性",
+        "value": "良好的保护作用"
+      }
+    ],
+    "evidence": "锡青铜耐蚀性优良, 表面生成 $SnO_{2}$ 薄膜, 能起很好的保护作用。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "形状记忆效应",
+    "entity_type": "Property",
+    "normalized_name": "形状记忆效应",
+    "aliases": [],
+    "definition": "材料在温度变化下能自动回复变形前形状的性能。",
+    "attributes": [
+      {
+        "key": "测量条件",
+        "value": "温度变化，加热至As以上，冷却或加应力诱发马氏体相变"
+      }
+    ],
+    "evidence": "给已适当变形的材料以温度变化,它能自动作功而回复变形前形状的效应称“形状记忆效应”",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "单向形状记忆效应",
+    "entity_type": "Property",
+    "normalized_name": "单向形状记忆效应",
+    "aliases": [],
+    "definition": "材料在加热后马氏体逆转变，完全恢复母相形状的效应。",
+    "attributes": [
+      {
+        "key": "测量条件",
+        "value": "加热至As以上，升至Af点马氏体完全消失"
+      }
+    ],
+    "evidence": "第一种称为单向形状记忆效应,即将母相冷却或加应力,使之发生马氏体相变,然后使马氏体发生变形,改变其形状,再重新加热到 $A_{s}$ 以上,马氏体发生逆转变,温度升至 $A_{f}$ 点,马氏体完全消失,材料完全恢复母相形状。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "双向形状记忆效应",
+    "entity_type": "Property",
+    "normalized_name": "双向形状记忆效应",
+    "aliases": [
+      "可逆形状记忆效应"
+    ],
+    "definition": "材料在加热时回复母相形状，冷却时自觉回复原马氏体形状的现象。",
+    "attributes": [
+      {
+        "key": "测量条件",
+        "value": "加热和冷却循环"
+      }
+    ],
+    "evidence": "有些形状记忆合金在加热发生马氏体逆转变时,对母相有记忆效应;当从母相再次冷却为马氏体时,自觉回复原马氏体的形状,这种现象称为双向形状记忆效应,又称可逆形状记忆效应",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "全方位形状记忆效应",
+    "entity_type": "Property",
+    "normalized_name": "全方位形状记忆效应",
+    "aliases": [],
+    "definition": "在冷热循环过程中，材料形状回复到与母相完全相反的形状。",
+    "attributes": [
+      {
+        "key": "测量条件",
+        "value": "冷热循环"
+      }
+    ],
+    "evidence": "第三种情况是在 Ti-Ni 合金系中发现的, 在冷热循环过程中, 形状回复到与母相完全相反的形状, 称为全方位形状记忆效应",
+    "confidence": 0.9
+  },
+  {
+    "entity_text": "高阻尼",
+    "entity_type": "Property",
+    "normalized_name": "高阻尼",
+    "aliases": [],
+    "definition": "铜基形状记忆合金具有吸收振动能量的能力。",
+    "attributes": [
+      {
+        "key": "特点",
+        "value": "良好的振动能量吸收能力"
+      }
+    ],
+    "evidence": "铜基形状记忆合金……具有形状记忆、超弹性、高阻尼和良好的导电性四大功能",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "良好的导电性",
+    "entity_type": "Property",
+    "normalized_name": "导电性",
+    "aliases": [],
+    "definition": "铜基形状记忆合金具有良好的电导能力。",
+    "attributes": [
+      {
+        "key": "特点",
+        "value": "良好的导电性"
+      }
+    ],
+    "evidence": "铜基形状记忆合金……具有形状记忆、超弹性、高阻尼和良好的导电性四大功能",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "耐蚀性",
+    "entity_type": "ServicePerformance",
+    "normalized_name": "耐蚀性",
+    "aliases": [
+      "耐腐蚀性"
+    ],
+    "definition": "材料在特定环境中抵抗化学或电化学腐蚀的能力。",
+    "attributes": [
+      {
+        "key": "测试条件",
+        "value": "大气、海洋环境"
+      },
+      {
+        "key": "评价标准",
+        "value": "表面生成保护膜，微电池作用微弱"
+      }
+    ],
+    "evidence": "锡青铜耐蚀性优良, 表面生成 $SnO_{2}$ 薄膜, 能起很好的保护作用。同时, α 和 δ 相的电位相近, 微电池作用很微弱。铝青铜……在大气和海洋环境中有很高的耐蚀性能。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "耐磨性",
+    "entity_type": "ServicePerformance",
+    "normalized_name": "耐磨性",
+    "aliases": [],
+    "definition": "材料抵抗磨损的能力。",
+    "attributes": [
+      {
+        "key": "评价标准",
+        "value": "δ相硬而脆，提高强度和耐磨性"
+      }
+    ],
+    "evidence": "δ 相为复杂六方晶格的 $Cu_{31}Sn_{8}$ 金属间化合物, 其共析分解十分缓慢, 硬而脆, 故能提高强度和耐磨性。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "抗冲击",
+    "entity_type": "ServicePerformance",
+    "normalized_name": "抗冲击性",
+    "aliases": [
+      "抗冲击"
+    ],
+    "definition": "材料抵抗冲击载荷的能力。",
+    "attributes": [
+      {
+        "key": "评价标准",
+        "value": "铝青铜强度高、抗冲击"
+      }
+    ],
+    "evidence": "铝青铜……强度高、抗冲击,而且价格便宜。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "雕塑",
+    "entity_type": "Application",
+    "normalized_name": "雕塑",
+    "aliases": [],
+    "definition": "使用铜合金制作艺术雕像和城市纪念性雕塑的应用场景。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "紫铜、黄铜、铝青铜、18合金"
+      },
+      {
+        "key": "优势",
+        "value": "韧性好，色泽华贵，加工性能优良"
+      }
+    ],
+    "evidence": "紫铜……多用作雕塑、人物雕像。……“18合金”……成为巨型佛像、城市纪念性雕塑的首选材料。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "乐器",
+    "entity_type": "Application",
+    "normalized_name": "乐器",
+    "aliases": [],
+    "definition": "使用铜合金制造钟、鼓等乐器的应用场景。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "锡青铜"
+      },
+      {
+        "key": "优势",
+        "value": "音质、响度可控，音色丰富"
+      }
+    ],
+    "evidence": "艺术用铜合金是指那些用于制造……乐器……的铜合金。……钟用锡青铜……音色单调、尖锐刺耳。……鼓用锡青铜……我国古代典型铜鼓",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "钱币",
+    "entity_type": "Application",
+    "normalized_name": "钱币",
+    "aliases": [],
+    "definition": "使用铜合金制造货币的应用场景。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "紫铜、黄铜、锡青铜、白铜"
+      },
+      {
+        "key": "优势",
+        "value": "色泽美观，硬度高，易于刻印"
+      }
+    ],
+    "evidence": "艺术用铜合金是指那些用于制造……钱币等的铜合金。……币用锡青铜也是 Cu、Sn、Pb 三元合金……明、清以后多用紫铜和黄铜。……含20%左右的白铜常用来制造钱币",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "缓冷脆裂",
+    "entity_type": "FailureMode",
+    "normalized_name": "缓冷脆裂",
+    "aliases": [],
+    "definition": "铝青铜中γ相在565℃以下缓冷时发生的脆性开裂现象。",
+    "attributes": [
+      {
+        "key": "诱发条件",
+        "value": "Al含量超过固溶极限，缓冷至565℃以下"
+      },
+      {
+        "key": "表现特征",
+        "value": "铸件裂纹"
+      }
+    ],
+    "evidence": "合金中 Al 含量超过固溶极限后会出现 γ 相,它硬而脆,且会在 565℃以下温度发生缓冷脆裂,导致铸件裂纹。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Zn",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Zn",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Zn-Al",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Zn-Al",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Zn-Sn",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Zn-Sn",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Zn-Ni",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Zn-Ni",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Zn-Si",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Zn-Si",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Zn-Ga",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Zn-Ga",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Al",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Al",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Al-Ni",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Al-Ni",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Al-Mn",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Al-Mn",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Al-Si",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Al-Si",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Al-Nb",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Al-Nb",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "Cu-Al-Be",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "Cu-Al-Be",
+    "aliases": [],
+    "definition": "一种具有形状记忆效应的铜基合金体系。",
+    "attributes": [],
+    "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "马氏体",
+    "entity_type": "Phase",
+    "normalized_name": "马氏体",
+    "aliases": [],
+    "definition": "在冷却过程中无应力条件下于 $M_{\\mathrm{s}}$ 开始形成的相。",
+    "attributes": {
+      "形成条件": "$M_{\\mathrm{s}}$ 温度以下，无应力或有应力条件下"
+    },
+    "evidence": "在无应力条件下，马氏体在 $M_{\\mathrm{s}}$ 开始形成。若施加应力，马氏体可以在 $M_{\\mathrm{s}}$ 以上温度形成，这种马氏体称为应力诱发马氏体(Stress-Induced Martensite,简称SIM)。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "应力诱发马氏体",
+    "entity_type": "Phase",
+    "normalized_name": "应力诱发马氏体",
+    "aliases": [
+      "Stress-Induced Martensite",
+      "SIM"
+    ],
+    "definition": "在应力作用下于 $M_{\\mathrm{s}}$ 以上温度形成的马氏体相。",
+    "attributes": {
+      "形成条件": "在 $M_{\\mathrm{s}} \\sim M_{\\mathrm{d}}$ 温度范围施加应力"
+    },
+    "evidence": "若施加应力，马氏体可以在 $M_{\\mathrm{s}}$ 以上温度形成，这种马氏体称为应力诱发马氏体(Stress-Induced Martensite,简称SIM)。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "奥氏体",
+    "entity_type": "Phase",
+    "normalized_name": "奥氏体",
+    "aliases": [],
+    "definition": "马氏体相变的母相，在加热过程中由马氏体逆转变为奥氏体。",
+    "attributes": {},
+    "evidence": "水开后，蒸汽吹至 SMAs 元件上发生马氏体向奥氏体相变，弹簧伸长带动按钮推开电触头，达到自动切断电源的目的。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "伪弹性",
+    "entity_type": "PrecipitationMechanism",
+    "normalized_name": "伪弹性",
+    "aliases": [
+      "机械形状记忆效应"
+    ],
+    "definition": "在 $M_{\\mathrm{s}} \\sim M_{\\mathrm{d}}$ 温度范围施加应力产生类似橡胶的可逆大应变行为。",
+    "attributes": {
+      "温度范围": "$M_{\\mathrm{s}} \\sim M_{\\mathrm{d}}$",
+      "析出相": "应力诱发马氏体"
+    },
+    "evidence": "当材料处于 $M_{\\mathrm{s}} \\sim M_{\\mathrm{d}}$ 温度范围时发生变形，就会产生伪弹性，类似橡胶。伪弹性也可称之为机械形状记忆效应。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "可恢复应变量",
+    "entity_type": "Property",
+    "normalized_name": "可恢复应变量",
+    "aliases": [],
+    "definition": "伪弹性材料在应力消除后能恢复的应变大小。",
+    "attributes": {
+      "数值范围": "10% 以上",
+      "测量条件": "在超弹性应力-应变曲线下部平台"
+    },
+    "evidence": "它们的可恢复应变量达到 $10\\%$ 以上。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "弹性应变",
+    "entity_type": "Property",
+    "normalized_name": "弹性应变",
+    "aliases": [],
+    "definition": "合金在未发生应力诱发相变前可承受的弹性变形量。",
+    "attributes": {
+      "数值范围": "2%"
+    },
+    "evidence": "在未发生应力诱发相变前,合金就具有2%的弹性应变,这样做成的弹簧也比一般弹簧性能好得多。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "超弹性",
+    "entity_type": "Property",
+    "normalized_name": "超弹性",
+    "aliases": [],
+    "definition": "形状记忆合金在相变过程中表现出的大可逆弹性应变性能。",
+    "attributes": {
+      "数值范围": "10% 以上"
+    },
+    "evidence": "图9-2表示超弹性的应力一应变曲线。……它们的可恢复应变量达到 $10\\%$ 以上。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "内耗",
+    "entity_type": "Property",
+    "normalized_name": "内耗",
+    "aliases": [],
+    "definition": "材料减振性能的主要衡量指标，反映材料在振动中能量耗散的能力。",
+    "attributes": {},
+    "evidence": "材料减振性能的主要衡量指标就是材料的内耗值。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "减振性",
+    "entity_type": "ServicePerformance",
+    "normalized_name": "减振性",
+    "aliases": [
+      "阻尼性能"
+    ],
+    "definition": "材料在振动中吸收能量、抑制振动的能力。",
+    "attributes": {
+      "评价标准": "内耗值高，特别是在相变温度附近"
+    },
+    "evidence": "优良的阻尼性能, 即高减振性;……复合板材在 $M_{s}$ 点附近及以下很宽的温度范围内均显示出优异的减振性,特别是在相变温度附近,内耗值达最大。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "热敏控制器",
+    "entity_type": "Application",
+    "normalized_name": "热敏控制器",
+    "aliases": [],
+    "definition": "利用形状记忆合金的相变温度特性实现温度感知与驱动控制的应用。",
+    "attributes": {
+      "适用合金类型": "铜基形状记忆合金",
+      "优势": "兼具感知与驱动功能，响应灵敏"
+    },
+    "evidence": "SMAs 是一种热敏材料。它可以按环境条件选取适当的合金，控制其 $M_{s}$ 、 $A_{f}$ 及变温范围，借助 SMAs 的形状记忆达到控温目的。……SMAs 不仅可作为感知器，更重要的是可兼负驱动作用。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "自适应紧固件",
+    "entity_type": "Application",
+    "normalized_name": "自适应紧固件",
+    "aliases": [
+      "自动紧固件",
+      "连接件",
+      "密封垫"
+    ],
+    "definition": "利用形状记忆合金的热收缩特性实现自动装配与密封的部件。",
+    "attributes": {
+      "适用合金类型": "记忆合金管接头",
+      "优势": "气密性好，拉脱力强"
+    },
+    "evidence": "自动紧固件,即热收缩的管接头,使用方法是把制作好的记忆合金管接头(一般内径比被连接的管子外径小4%左右)放在低温 $T<90℃$ 贮存……气密性 在振动及 5 MPa 静压下，5 min 压力不降,无泄露",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "自动调节装置",
+    "entity_type": "Application",
+    "normalized_name": "自动调节装置",
+    "aliases": [],
+    "definition": "利用形状记忆合金的温度响应形变实现自动控制的装置。",
+    "attributes": {
+      "适用合金类型": "Cu基SMAs",
+      "优势": "结构简单，响应大"
+    },
+    "evidence": "图 9-5 所示为美国和日本生产的育苗室、温室等天窗自动控制器, 其中用 Cu 基 SMAs 制作的弹簧充当温度传感器和动力机构。……类似的还有热机冷却风扇启闭器、散热器阀门、空调风向调节器等。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "色调记忆配件",
+    "entity_type": "Application",
+    "normalized_name": "色调记忆配件",
+    "aliases": [],
+    "definition": "利用铜合金在相变时颜色变化实现温度指示或应力指示的功能部件。",
+    "attributes": {
+      "适用合金类型": "含12%~15%Al和1%~5%Ni的铜合金",
+      "优势": "相变特性温度可调，用于温度或应力指示"
+    },
+    "evidence": "含 12%\\~15% Al(质量分数)和 1%\\~5% Ni(质量分数)的铜合金是具有热弹性马氏体相变的色调记忆元件，在 200\\~400℃范围内具有相变特性温度。通过相变，合金的色调从红色变为金黄色。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "弹性减振复合材料",
+    "entity_type": "Application",
+    "normalized_name": "弹性减振复合材料",
+    "aliases": [],
+    "definition": "由高导电高弹性材料与高减振铜基形状记忆合金复合而成的新型功能材料。",
+    "attributes": {
+      "适用合金类型": "CuAlNiMnTi与QBe2爆炸复合",
+      "优势": "内耗值高，减振性能优异"
+    },
+    "evidence": "选用铍青铜作为高导电、高弹性组元与高减振的铜基形状记忆合金进行爆炸复合,可制成一种新型弹性减振复合材料。",
+    "confidence": 1.0
+  },
+  {
+    "entity_text": "铸锭质量及缺陷分析",
+    "entity_type": "FailureMode",
+    "normalized_name": "铸锭缺陷",
+    "aliases": [
+      "缺陷分析"
+    ],
+    "definition": "在铜合金铸锭生产过程中可能出现的质量问题及其失效形式。",
+    "attributes": [
+      {
+        "key": "诱发条件",
+        "value": "铸造工艺控制不当"
+      },
+      {
+        "key": "表现特征",
+        "value": "裂纹、气孔、偏析等"
+      }
+    ],
+    "evidence": "16.5 铸锭质量及缺陷分析 …… 434",
+    "confidence": 0.8
+  },
+  {
+    "entity_text": "立式半连续铸造",
+    "entity_type": "Application",
+    "normalized_name": "立式半连续铸造",
+    "aliases": [],
+    "definition": "一种用于铜合金铸锭生产的铸造工艺方法。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "适用于大尺寸铸锭生产"
+      }
+    ],
+    "evidence": "17.1 立式半连续铸造设备 …… 441",
+    "confidence": 0.85
+  },
+  {
+    "entity_text": "立式连续铸造",
+    "entity_type": "Application",
+    "normalized_name": "立式连续铸造",
+    "aliases": [],
+    "definition": "一种连续铸造铜合金铸锭的工艺技术。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "生产效率高"
+      }
+    ],
+    "evidence": "17.2 立式连续铸造设备 446",
+    "confidence": 0.85
+  },
+  {
+    "entity_text": "水平连续铸造",
+    "entity_type": "Application",
+    "normalized_name": "水平连续铸造",
+    "aliases": [],
+    "definition": "一种在水平方向上进行连续铸造铜合金铸锭的技术。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "适用于长条形铸坯生产"
+      }
+    ],
+    "evidence": "17.3 水平连续铸造设备 448",
+    "confidence": 0.85
+  },
+  {
+    "entity_text": "结晶器及其振动和间歇铸造装置",
+    "entity_type": "Application",
+    "normalized_name": "间歇铸造",
+    "aliases": [
+      "振动铸造"
+    ],
+    "definition": "通过结晶器振动实现间歇式铸造的工艺方法。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "改善铸锭表面质量"
+      }
+    ],
+    "evidence": "17.4 结晶器及其振动和间歇铸造装置 452",
+    "confidence": 0.8
+  },
+  {
+    "entity_text": "铸锭加工设备及运输工具",
+    "entity_type": "Application",
+    "normalized_name": "铸锭加工与运输",
+    "aliases": [
+      "运输工具"
+    ],
+    "definition": "用于铜合金铸锭后续加工和搬运的设备系统。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "提高生产连续性"
+      }
+    ],
+    "evidence": "17.5 铸锭加工设备及运输工具…… 464",
+    "confidence": 0.7
+  },
+  {
+    "entity_text": "铁模和水冷模铸造",
+    "entity_type": "Application",
+    "normalized_name": "铁模和水冷模铸造",
+    "aliases": [],
+    "definition": "使用铁质铸模或水冷铸模进行铜合金铸造的工艺。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "冷却速率可控，组织均匀"
+      }
+    ],
+    "evidence": "18.1 铁模和水冷模铸造技术 …… 471",
+    "confidence": 0.85
+  },
+  {
+    "entity_text": "铸模涂料",
+    "entity_type": "MaterialSystem",
+    "normalized_name": "铸模涂料",
+    "aliases": [
+      "涂料"
+    ],
+    "definition": "涂覆在铸模表面以改善脱模性和铸件质量的材料。",
+    "attributes": [
+      {
+        "key": "特点",
+        "value": "耐高温、隔热、防粘模"
+      }
+    ],
+    "evidence": "18.2 铸模涂料及其制备 …… 472",
+    "confidence": 0.75
+  },
+  {
+    "entity_text": "真空吸铸",
+    "entity_type": "Application",
+    "normalized_name": "真空吸铸",
+    "aliases": [],
+    "definition": "在真空条件下通过负压吸入金属液完成铸造的工艺。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "减少氧化和气孔"
+      }
+    ],
+    "evidence": "18.5 真空吸铸 481",
+    "confidence": 0.8
+  },
+  {
+    "entity_text": "上引式连铸",
+    "entity_type": "Application",
+    "normalized_name": "上引式连铸",
+    "aliases": [],
+    "definition": "一种通过石墨结晶器自下而上牵引铜合金熔体形成铸坯的连续铸造技术。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜及铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "组织致密，表面质量好"
+      }
+    ],
+    "evidence": "19.1 上引式连铸 483",
+    "confidence": 0.9
+  },
+  {
+    "entity_text": "轮带式连铸",
+    "entity_type": "Application",
+    "normalized_name": "轮带式连铸",
+    "aliases": [],
+    "definition": "利用旋转结晶轮与钢带构成封闭腔体进行连续铸造的工艺。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜及铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "适合薄板坯生产"
+      }
+    ],
+    "evidence": "19.2 轮带式连铸 485",
+    "confidence": 0.85
+  },
+  {
+    "entity_text": "钢带式连铸",
+    "entity_type": "Application",
+    "normalized_name": "钢带式连铸",
+    "aliases": [],
+    "definition": "采用双钢带作为结晶器进行铜合金连续铸造的技术。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜及铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "冷却均匀，适合宽幅带材"
+      }
+    ],
+    "evidence": "19.3 钢带式连铸 487",
+    "confidence": 0.85
+  },
+  {
+    "entity_text": "浸渍成型铸造",
+    "entity_type": "Application",
+    "normalized_name": "浸渍成型铸造",
+    "aliases": [],
+    "definition": "将模具浸入金属熔体中实现成型铸造的方法。",
+    "attributes": [
+      {
+        "key": "适用合金类型",
+        "value": "铜及铜合金"
+      },
+      {
+        "key": "优势",
+        "value": "适用于复杂形状铸件"
+      }
+    ],
+    "evidence": "19.4 浸渍成型铸造 489",
+    "confidence": 0.8
+  }
+]

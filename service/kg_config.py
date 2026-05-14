@@ -281,6 +281,9 @@ def create_lightrag_neo4j_qdrant(
     """
     load_env(env_path)
 
+    # 从 custom_entity_service 读取实体类型（保证单一来源）
+    from .custom_entity_service import ENTITY_TYPES as _ENTITY_TYPES
+
     # 启动持久事件循环
     ploop = _PersistentLoop()
     ploop.start()
@@ -303,17 +306,7 @@ def create_lightrag_neo4j_qdrant(
         # 自定义实体类型引导
         addon_params={
             "language": "Chinese",
-            "entity_types": [
-                "MaterialSystem",
-                "Phase",
-                "ConductivityMechanism",
-                "StrengtheningMechanism",
-                "PrecipitationMechanism",
-                "Property",
-                "ServicePerformance",
-                "Application",
-                "FailureMode",
-            ],
+            "entity_types": _ENTITY_TYPES,
         },
         # 分块参数
         chunk_token_size=1200,

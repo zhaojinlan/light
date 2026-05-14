@@ -1,0 +1,100 @@
+{
+  "source": "test.md",
+  "text_length": 8070,
+  "chunks": 3,
+  "total_entities": 61,
+  "total_relationships": 59,
+  "entities_by_type": {
+    "Application": 19,
+    "FailureMode": 2,
+    "MaterialSystem": 18,
+    "Phase": 7,
+    "PrecipitationMechanism": 1,
+    "Property": 10,
+    "ServicePerformance": 4
+  },
+  "entity_type_details": {
+    "Application": [
+      "雕塑",
+      "乐器",
+      "钱币",
+      "热敏控制器",
+      "自适应紧固件",
+      "自动调节装置",
+      "色调记忆配件",
+      "弹性减振复合材料",
+      "立式半连续铸造",
+      "立式连续铸造",
+      "水平连续铸造",
+      "间歇铸造",
+      "铸锭加工与运输",
+      "铁模和水冷模铸造",
+      "真空吸铸",
+      "上引式连铸",
+      "轮带式连铸",
+      "钢带式连铸",
+      "浸渍成型铸造"
+    ],
+    "FailureMode": [
+      "缓冷脆裂",
+      "铸锭缺陷"
+    ],
+    "MaterialSystem": [
+      "Cu",
+      "CuZn",
+      "CuSn",
+      "CuNi",
+      "CuAl",
+      "Cu-Zn",
+      "Cu-Zn-Al",
+      "Cu-Zn-Sn",
+      "Cu-Zn-Ni",
+      "Cu-Zn-Si",
+      "Cu-Zn-Ga",
+      "Cu-Al",
+      "Cu-Al-Ni",
+      "Cu-Al-Mn",
+      "Cu-Al-Si",
+      "Cu-Al-Nb",
+      "Cu-Al-Be",
+      "铸模涂料"
+    ],
+    "Phase": [
+      "α相",
+      "δ相",
+      "Al₂O₃",
+      "SnO₂",
+      "马氏体",
+      "应力诱发马氏体",
+      "奥氏体"
+    ],
+    "PrecipitationMechanism": [
+      "伪弹性"
+    ],
+    "Property": [
+      "形状记忆效应",
+      "单向形状记忆效应",
+      "双向形状记忆效应",
+      "全方位形状记忆效应",
+      "高阻尼",
+      "导电性",
+      "可恢复应变量",
+      "弹性应变",
+      "超弹性",
+      "内耗"
+    ],
+    "ServicePerformance": [
+      "耐蚀性",
+      "耐磨性",
+      "抗冲击性",
+      "减振性"
+    ]
+  },
+  "relationship_type_counts": {
+    "contains": 4,
+    "failure_mode_of": 2,
+    "has_phase": 11,
+    "has_property": 32,
+    "used_in": 10
+  }
+}
