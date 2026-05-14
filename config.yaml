@@ -1,0 +1,12 @@
+llm:
+  api_key: gpustack_2ac06a646549b075_97f1450f7574246ed84360d61c10f10a
+  model: Qwen3-235B-A22B-Instruct
+  base_url: http://10.22.2.31:38080/v1
+embedding:
+  api_key: "sk-lgbjzmtisjhokjkkmllxztnvilwolnpuiwntkrhlzaptvrki"
+  base_url: "http://10.22.2.31:30110/v1/"
+  model: "bge-m3"
+rerank:
+  api_key: "sk-lgbjzmtisjhokjkkmllxztnvilwolnpuiwntkrhlzaptvrki"
+  base_url: "http://10.22.2.31:30102/v1/rerank"
+  model: "bge-reranker-v2-m3"

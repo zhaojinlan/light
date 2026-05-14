@@ -1,0 +1,822 @@
+{
+  "source_file": "test.md",
+  "total_entities": 92,
+  "entities_by_type": {
+    "MaterialSystem": 26,
+    "Phase": 6,
+    "StrengtheningMechanism": 3,
+    "Property": 26,
+    "ServicePerformance": 6,
+    "Application": 22,
+    "FailureMode": 3
+  },
+  "entities": [
+    {
+      "entity_text": "紫铜",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "Cu",
+      "aliases": [
+        "紫铜"
+      ],
+      "evidence": "而按照合金成分则可以分为紫铜、黄铜、青铜和白铜。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "黄铜",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZn",
+      "aliases": [
+        "黄铜"
+      ],
+      "evidence": "而按照合金成分则可以分为紫铜、黄铜、青铜和白铜。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "青铜",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuSn",
+      "aliases": [
+        "青铜"
+      ],
+      "evidence": "而按照合金成分则可以分为紫铜、黄铜、青铜和白铜。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "白铜",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuNi",
+      "aliases": [
+        "白铜"
+      ],
+      "evidence": "而按照合金成分则可以分为紫铜、黄铜、青铜和白铜。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn6Al0.5P",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnAlP",
+      "aliases": [
+        "ZCuZn6Al0.5P"
+      ],
+      "evidence": "艺术用铸造黄铜的牌号和化学成分列于表9-1。合金CuZn6Al0.5P余量4~80.4~0.70.1~0.3/P金黄",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn12Al",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnAl",
+      "aliases": [
+        "ZCuZn12Al"
+      ],
+      "evidence": "ZCuZn12Al87~89余量1.0~2.0",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn24Sn1Pb3",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnSnPb",
+      "aliases": [
+        "ZCuZn24Sn1Pb3"
+      ],
+      "evidence": "ZCuZn24Sn1Pb370~74余量0.5~1.51.5~3.5",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn27Mn3Pb2Sn",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnMnPbSn",
+      "aliases": [
+        "ZCuZn27Mn3Pb2Sn"
+      ],
+      "evidence": "ZCuZn27Mn3Pb2Sn余量25~300.3~0.52.0~3.02.5~4.0",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn33Mn2Pb",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnMnPb",
+      "aliases": [
+        "ZCuZn33Mn2Pb"
+      ],
+      "evidence": "ZCuZn33Mn2Pb余量32~340.3~0.50.5~1.01.5~2.7",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn35Sn1Al",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnSnAl",
+      "aliases": [
+        "ZCuZn35Sn1Al"
+      ],
+      "evidence": "ZCuZn35Sn1Al64~66余量0.5~1.50.2~0.4",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn38Sn1Pb1Al",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnSnPbAl",
+      "aliases": [
+        "ZCuZn38Sn1Pb1Al"
+      ],
+      "evidence": "ZCuZn38Sn1Pb1Al58~64余量0.5~1.50.5~1.00.8~1.5",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn38Al1Mn",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnAlMn",
+      "aliases": [
+        "ZCuZn38Al1Mn"
+      ],
+      "evidence": "ZCuZn38Al1Mn57~62余量0.25~0.50.1~1.0银",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuZn20Mn20Sn1Al",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnMnSnAl",
+      "aliases": [
+        "ZCuZn20Mn20Sn1Al"
+      ],
+      "evidence": "ZCuZn20Mn20Sn1Al55~6117~230.5~2.50.25~3.00.1~2.17",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuSn2Zn3",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuSnZn",
+      "aliases": [
+        "ZCuSn2Zn3"
+      ],
+      "evidence": "ZCuSn2Zn31.8~2.22.5~3.5余量",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuSn3Al2",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuSnAl",
+      "aliases": [
+        "ZCuSn3Al2"
+      ],
+      "evidence": "ZCuSn3Al22.5~3.51.5~3.5余量",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "ZCuSn12Mn1",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuSnMn",
+      "aliases": [
+        "ZCuSn12Mn1"
+      ],
+      "evidence": "ZCuSn12Mn110~150.15~0.250.2~0.31.0~1.25余量",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "α相",
+      "entity_type": "Phase",
+      "normalized_name": "α相",
+      "aliases": [],
+      "evidence": "α 相是锡在铜中的固溶体，面心立方晶格。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "δ相",
+      "entity_type": "Phase",
+      "normalized_name": "δ相",
+      "aliases": [
+        "Cu31Sn8"
+      ],
+      "evidence": "δ 相为复杂六方晶格的 Cu_{31}Sn_{8} 金属间化合物",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "固溶强化",
+      "entity_type": "StrengtheningMechanism",
+      "normalized_name": "固溶强化",
+      "aliases": [],
+      "evidence": "Zn溶于α固溶体,缩小凝固温度范围,提高流动性,能还原 SnO_{2} ,净化合金。",
+      "confidence": 0.85
+    },
+    {
+      "entity_text": "析出强化",
+      "entity_type": "StrengtheningMechanism",
+      "normalized_name": "析出强化",
+      "aliases": [
+        "时效强化",
+        "沉淀强化"
+      ],
+      "evidence": "δ 相为复杂六方晶格的 Cu_{31}Sn_{8} 金属间化合物, 其共析分解十分缓慢, 硬而脆, 故能提高强度和耐磨性。",
+      "confidence": 0.9
+    },
+    {
+      "entity_text": "细晶强化",
+      "entity_type": "StrengtheningMechanism",
+      "normalized_name": "细晶强化",
+      "aliases": [],
+      "evidence": "锡青铜结晶温度范围宽, 易产生疏松和补缩困难。",
+      "confidence": 0.65
+    },
+    {
+      "entity_text": "硬度",
+      "entity_type": "Property",
+      "normalized_name": "硬度",
+      "aliases": [],
+      "evidence": "高锡青铜有很高的硬度,研磨后可获得极光滑的表面。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "耐蚀性",
+      "entity_type": "Property",
+      "normalized_name": "耐蚀性",
+      "aliases": [],
+      "evidence": "青铜具有青靛色，耐蚀性好，用作器皿，稳重耐久。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "色泽",
+      "entity_type": "Property",
+      "normalized_name": "色泽",
+      "aliases": [],
+      "evidence": "与普通铜合金不同的是它们对色泽、耐蚀性、磨削加工性或音质、响度有特殊要求。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "音质",
+      "entity_type": "Property",
+      "normalized_name": "音质",
+      "aliases": [],
+      "evidence": "与普通铜合金不同的是它们对色泽、耐蚀性、磨削加工性或音质、响度有特殊要求。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "响度",
+      "entity_type": "Property",
+      "normalized_name": "响度",
+      "aliases": [],
+      "evidence": "与普通铜合金不同的是它们对色泽、耐蚀性、磨削加工性或音质、响度有特殊要求。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "磨削加工性",
+      "entity_type": "Property",
+      "normalized_name": "磨削加工性",
+      "aliases": [],
+      "evidence": "与普通铜合金不同的是它们对色泽、耐蚀性、磨削加工性或音质、响度有特殊要求。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "韧性",
+      "entity_type": "Property",
+      "normalized_name": "韧性",
+      "aliases": [],
+      "evidence": "紫铜具有古铜色，朴实、大方、庄严，韧性好，焊接性能优良，多用作雕塑、人物雕像。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "焊接性能",
+      "entity_type": "Property",
+      "normalized_name": "焊接性能",
+      "aliases": [],
+      "evidence": "紫铜具有古铜色，朴实、大方、庄严，韧性好，焊接性能优良，多用作雕塑、人物雕像。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "耐磨性",
+      "entity_type": "ServicePerformance",
+      "normalized_name": "耐磨性",
+      "aliases": [],
+      "evidence": "故能提高强度和耐磨性。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "耐水性",
+      "entity_type": "ServicePerformance",
+      "normalized_name": "耐水性",
+      "aliases": [],
+      "evidence": "Pb的衰减能力很大。含量过高时会形成重力偏析P磷在锡青铜中的溶解度很小,磷过量会析出硬而脆的 Cu_{3}P",
+      "confidence": 0.7
+    },
+    {
+      "entity_text": "抗氧化性",
+      "entity_type": "ServicePerformance",
+      "normalized_name": "抗氧化性",
+      "aliases": [],
+      "evidence": "表面生成 SnO_{2} 薄膜, 能起很好的保护作用。",
+      "confidence": 0.85
+    },
+    {
+      "entity_text": "抗热应力松弛",
+      "entity_type": "ServicePerformance",
+      "normalized_name": "抗热应力松弛",
+      "aliases": [],
+      "evidence": "",
+      "confidence": 0.5
+    },
+    {
+      "entity_text": "雕塑",
+      "entity_type": "Application",
+      "normalized_name": "雕塑",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "佛像",
+      "entity_type": "Application",
+      "normalized_name": "佛像",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "乐器",
+      "entity_type": "Application",
+      "normalized_name": "乐器",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "兵器",
+      "entity_type": "Application",
+      "normalized_name": "兵器",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "钱币",
+      "entity_type": "Application",
+      "normalized_name": "钱币",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "鼎",
+      "entity_type": "Application",
+      "normalized_name": "鼎",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "镜",
+      "entity_type": "Application",
+      "normalized_name": "镜",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "鼓",
+      "entity_type": "Application",
+      "normalized_name": "鼓",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "香炉",
+      "entity_type": "Application",
+      "normalized_name": "香炉",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "艺术品",
+      "entity_type": "Application",
+      "normalized_name": "艺术品",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "装饰品",
+      "entity_type": "Application",
+      "normalized_name": "装饰品",
+      "aliases": [],
+      "evidence": "艺术用铜合金是指那些用于制造鼎、镜、鼓、香炉、佛像、雕塑等艺术品、装饰品和乐器、兵器或钱币等的铜合金。",
+      "confidence": 0.98
+    },
+    {
+      "entity_text": "脱锌",
+      "entity_type": "FailureMode",
+      "normalized_name": "脱锌",
+      "aliases": [],
+      "evidence": "有时还会使铸文、图案细部模糊不清",
+      "confidence": 0.6
+    },
+    {
+      "entity_text": "铝青铜",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuAl",
+      "aliases": [
+        "铝青铜"
+      ],
+      "evidence": "铝青铜与锡青铜相比有更多的优点:材料表面有一层可以自愈的 $Al_{2}O_{3}$ 保护膜,在大气和海洋环境中有很高的耐蚀性能。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Zn-Sn",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnSn",
+      "aliases": [
+        "Cu-Zn-Sn"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Zn-Ni",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnNi",
+      "aliases": [
+        "Cu-Zn-Ni"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Zn-Si",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnSi",
+      "aliases": [
+        "Cu-Zn-Si"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Zn-Ga",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuZnGa",
+      "aliases": [
+        "Cu-Zn-Ga"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Al-Ni",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuAlNi",
+      "aliases": [
+        "Cu-Al-Ni"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Al-Mn",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuAlMn",
+      "aliases": [
+        "Cu-Al-Mn"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Al-Si",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuAlSi",
+      "aliases": [
+        "Cu-Al-Si"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Al-Nb",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuAlNb",
+      "aliases": [
+        "Cu-Al-Nb"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "Cu-Al-Be",
+      "entity_type": "MaterialSystem",
+      "normalized_name": "CuAlBe",
+      "aliases": [
+        "Cu-Al-Be"
+      ],
+      "evidence": "现已发现具有形状记忆效应的铜基形状记忆合金体系有: Cu - Zn, Cu-Zn-Al, Cu-Zn-Sn, Cu-Zn-Ni, Cu-Zn-Si, Cu-Zn-Ga, Cu-Al, Cu-Al-Ni, Cu-Al-Mn, Cu-Al-Si, Cu-Al-Nb, Cu-Al-Be 等。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "γ相",
+      "entity_type": "Phase",
+      "normalized_name": "γ相",
+      "aliases": [],
+      "evidence": "合金中 Al 含量超过固溶极限后会出现 $\\gamma$ 相,它硬而脆,且会在 565℃以下温度发生缓冷脆裂,导致铸件裂纹。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "马氏体",
+      "entity_type": "Phase",
+      "normalized_name": "马氏体",
+      "aliases": [],
+      "evidence": "冷却时，在无应力条件下，马氏体在 $M_{\\mathrm{s}}$ 开始形成。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "母相",
+      "entity_type": "Phase",
+      "normalized_name": "母相",
+      "aliases": [],
+      "evidence": "当材料处于 $M_{\\mathrm{s}} \\sim M_{\\mathrm{d}}$ 温度范围时发生变形，就会产生伪弹性，类似橡胶。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "应力诱发马氏体",
+      "entity_type": "Phase",
+      "normalized_name": "应力诱发马氏体",
+      "aliases": [
+        "SIM"
+      ],
+      "evidence": "若施加应力，马氏体可以在 $M_{\\mathrm{s}}$ 以上温度形成，这种马氏体称为应力诱发马氏体(Stress-Induced Martensite,简称SIM)。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "形状记忆效应",
+      "entity_type": "Property",
+      "normalized_name": "形状记忆效应",
+      "aliases": [],
+      "evidence": "给已适当变形的材料以温度变化,它能自动作功而回复变形前形状的效应称“形状记忆效应”(Shape Memory Effect),具有形状记忆效应的合金称为形状记忆合金(Shape Memory Alloy)。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "伪弹性",
+      "entity_type": "Property",
+      "normalized_name": "伪弹性",
+      "aliases": [
+        "超弹性"
+      ],
+      "evidence": "伪弹性也可称之为机械形状记忆效应。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "抗拉强度",
+      "entity_type": "Property",
+      "normalized_name": "抗拉强度",
+      "aliases": [],
+      "evidence": "抗拉强度/MPa230~300",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "伸长率",
+      "entity_type": "Property",
+      "normalized_name": "伸长率",
+      "aliases": [
+        "延伸率"
+      ],
+      "evidence": "伸长率/%24~50",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "密度",
+      "entity_type": "Property",
+      "normalized_name": "密度",
+      "aliases": [],
+      "evidence": "密度/ $kg \\cdot m^{-3}$ 8130",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "比热容",
+      "entity_type": "Property",
+      "normalized_name": "比热容",
+      "aliases": [],
+      "evidence": "比热容/ $J \\cdot kg^{-1} \\cdot ^{\\circ}C^{-1}$ 380",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "线膨胀系数",
+      "entity_type": "Property",
+      "normalized_name": "线膨胀系数",
+      "aliases": [],
+      "evidence": "线膨胀系数/ $^{\\circ}C^{-1}$  $18.5 \\times 10^{-6}$",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "电阻率",
+      "entity_type": "Property",
+      "normalized_name": "电阻率",
+      "aliases": [],
+      "evidence": "电阻率μΩ·m0.07~0.12",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "导热率",
+      "entity_type": "Property",
+      "normalized_name": "导热率",
+      "aliases": [],
+      "evidence": "导热率W/(m·°C)120(20°C)",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "弹性模量",
+      "entity_type": "Property",
+      "normalized_name": "弹性模量",
+      "aliases": [],
+      "evidence": "弹性模量GPa70~100",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "屈服强度",
+      "entity_type": "Property",
+      "normalized_name": "屈服强度",
+      "aliases": [],
+      "evidence": "屈服强度MPa150~300",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "疲劳极限",
+      "entity_type": "Property",
+      "normalized_name": "疲劳极限",
+      "aliases": [],
+      "evidence": "疲劳极限MPa270",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "相变温度",
+      "entity_type": "Property",
+      "normalized_name": "相变温度",
+      "aliases": [],
+      "evidence": "转变温度°C-200~+170",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "最大单向形状记忆(应变)",
+      "entity_type": "Property",
+      "normalized_name": "最大单向形状记忆应变",
+      "aliases": [],
+      "evidence": "最大单向形状记忆(应变)%56",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "最大双向形状记忆(应变)",
+      "entity_type": "Property",
+      "normalized_name": "最大双向形状记忆应变",
+      "aliases": [],
+      "evidence": "最大双向形状记忆(应变)%N=10211.2N=1050.80.8N=1070.50.5",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "最大伪弹性应变",
+      "entity_type": "Property",
+      "normalized_name": "最大伪弹性应变",
+      "aliases": [],
+      "evidence": "最大伪弹性应变(单晶)%1010",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "回复应力",
+      "entity_type": "Property",
+      "normalized_name": "回复应力",
+      "aliases": [],
+      "evidence": "回复应力MPa200",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "抗冲击",
+      "entity_type": "ServicePerformance",
+      "normalized_name": "抗冲击性",
+      "aliases": [
+        "抗冲击"
+      ],
+      "evidence": "强度高、抗冲击,而且价格便宜。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "加工性能",
+      "entity_type": "ServicePerformance",
+      "normalized_name": "加工性能",
+      "aliases": [],
+      "evidence": "进一步改进铝青铜的色泽和加工性能",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "腐蚀速率",
+      "entity_type": "Property",
+      "normalized_name": "腐蚀速率",
+      "aliases": [],
+      "evidence": "3.5%NaCl25°C全浸的腐蚀速率/ $g \\cdot cm^{-2} \\cdot a^{-1}$ 7.26(锡青铜为9.32)",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "缓冷脆裂",
+      "entity_type": "FailureMode",
+      "normalized_name": "缓冷脆裂",
+      "aliases": [],
+      "evidence": "且会在 565℃以下温度发生缓冷脆裂,导致铸件裂纹。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "铸件裂纹",
+      "entity_type": "FailureMode",
+      "normalized_name": "铸件裂纹",
+      "aliases": [],
+      "evidence": "导致铸件裂纹。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "艺术用白铜",
+      "entity_type": "Application",
+      "normalized_name": "艺术制品",
+      "aliases": [
+        "艺术用白铜"
+      ],
+      "evidence": "9.1.5 艺术用白铜",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "餐具",
+      "entity_type": "Application",
+      "normalized_name": "餐具",
+      "aliases": [],
+      "evidence": "是选制餐具、乐器和装饰品的理想材料。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "航空",
+      "entity_type": "Application",
+      "normalized_name": "航空航天",
+      "aliases": [
+        "航空"
+      ],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "能源",
+      "entity_type": "Application",
+      "normalized_name": "能源",
+      "aliases": [],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "汽车工业",
+      "entity_type": "Application",
+      "normalized_name": "汽车",
+      "aliases": [
+        "汽车工业"
+      ],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "电子",
+      "entity_type": "Application",
+      "normalized_name": "电子工业",
+      "aliases": [],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "医疗",
+      "entity_type": "Application",
+      "normalized_name": "医疗",
+      "aliases": [],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "机械",
+      "entity_type": "Application",
+      "normalized_name": "机械",
+      "aliases": [],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "建筑",
+      "entity_type": "Application",
+      "normalized_name": "建筑",
+      "aliases": [],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "服装",
+      "entity_type": "Application",
+      "normalized_name": "服装",
+      "aliases": [],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    },
+    {
+      "entity_text": "玩具",
+      "entity_type": "Application",
+      "normalized_name": "玩具",
+      "aliases": [],
+      "evidence": "广泛应用于航空、航天、能源、汽车工业、电子、医疗、机械、建筑、服装、玩具等各个领域。",
+      "confidence": 0.95
+    }
+  ]
+}
