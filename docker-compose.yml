@@ -45,6 +45,25 @@ services:
       timeout: 5s
       retries: 10
 
+  # MongoDB — 文档 KV 存储
+  mongo:
+    image: mongo:7
+    container_name: lightrag-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongouser
+      - MONGO_INITDB_ROOT_PASSWORD=LightRAG2026Mongo!
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - lightrag-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
 volumes:
   neo4j_data:
     driver: local
@@ -55,6 +74,8 @@ volumes:
   neo4j_plugins:
     driver: local
   qdrant_data:
+    driver: local
+  mongo_data:
     driver: local
 
 networks:

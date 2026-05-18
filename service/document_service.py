@@ -50,7 +50,7 @@ class DocumentService:
 
         Example:
             >>> svc = DocumentService()
-            >>> track_id = svc.insert("铜合金具有优异的导电性和强度...")
+            >>> track_id = svc.insert("张某以虚构投资平台为由骗取他人财物...")
             >>> print(svc.get_processing_status())
         """
         return self.rag.insert(

@@ -53,12 +53,11 @@ class Neo4jDirectWriter:
         total = 0
         with self._driver.session() as session:
             for label, nodes in by_type.items():
-                # 为每个实体构建 props（不含 entity_name，它用于 MERGE key）
-                nodes_data = []
                 for e in nodes:
                     name = e["normalized_name"]
                     props = {
                         "entity_name": name,
+                        "entity_id": name,       # LightRAG 查询层使用 entity_id
                         "entity_type": label,
                         "description": (e.get("description") or e.get("definition") or "").strip(),
                         "source_id": (e.get("source_id") or "").strip(),
@@ -79,16 +78,13 @@ class Neo4jDirectWriter:
                         props["original_text"] = etext
                     # 写入时间戳
                     props["created_at"] = int(time.time())
-                    nodes_data.append(props)
 
-                query = f"""
-                UNWIND $nodes AS row
-                MERGE (n:`{self.WORKSPACE_LABEL}`:`{label}` {{entity_name: row.entity_name}})
-                SET n += row.props
-                """
-                result = session.run(query, nodes=nodes_data)
-                result.consume()
-                total += len(nodes_data)
+                    query = f"""
+                    MERGE (n:`{self.WORKSPACE_LABEL}`:`{label}` {{entity_name: $entity_name}})
+                    SET n += $props
+                    """
+                    session.run(query, entity_name=name, props=props)
+                    total += 1
 
         return total
 
@@ -127,11 +123,8 @@ class Neo4jDirectWriter:
         total = 0
         with self._driver.session() as session:
             for label, edges in by_type.items():
-                edges_data = []
                 for e in edges:
                     props = {
-                        "src_entity": e["src_entity"],
-                        "tgt_entity": e["tgt_entity"],
                         "source_id": e["source_id"],
                         "description": e["description"],
                         "weight": e["weight"],
@@ -141,19 +134,15 @@ class Neo4jDirectWriter:
                         props["evidence"] = e["evidence"]
                     if e["file_path"]:
                         props["file_path"] = e["file_path"]
-                    edges_data.append(props)
 
-                query = f"""
-                UNWIND $edges AS row
-                MATCH (src:`{self.WORKSPACE_LABEL}` {{entity_name: row.src_entity}})
-                WITH src, row
-                MATCH (tgt:`{self.WORKSPACE_LABEL}` {{entity_name: row.tgt_entity}})
-                MERGE (src)-[r:`{label}`]->(tgt)
-                SET r += row.props
-                """
-                result = session.run(query, edges=edges_data)
-                result.consume()
-                total += len(edges_data)
+                    query = f"""
+                    MATCH (src:`{self.WORKSPACE_LABEL}` {{entity_name: $src}})
+                    MATCH (tgt:`{self.WORKSPACE_LABEL}` {{entity_name: $tgt}})
+                    MERGE (src)-[r:`{label}`]->(tgt)
+                    SET r += $props
+                    """
+                    session.run(query, src=e["src_entity"], tgt=e["tgt_entity"], props=props)
+                    total += 1
 
         return total
 

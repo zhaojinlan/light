@@ -71,6 +71,15 @@ async def a_direct_ingest(
     chunk_to_source_map = {source_id: chunk_id}
 
     # ================================================================
+    # 1.5 为 chunk 生成 BM25 稀疏向量索引（关键词检索）
+    # ================================================================
+    from .bm25_retrieval import BM25RetrievalService
+
+    bm25_service = BM25RetrievalService(rag)
+    bm25_service.ensure_sparse_index()
+    bm25_service.index_chunk_bm25(chunk_id, chunk_content)
+
+    # ================================================================
     # 2. 处理 entity → entities_vdb（Qdrant 向量）
     # ================================================================
     deduped_entities: dict[str, dict[str, Any]] = {}
@@ -157,7 +166,7 @@ async def a_direct_ingest(
         })
 
     # ================================================================
-    # 6. doc_status → 标记 PROCESSED
+    # 6. doc_status → 标记 PROCESSED（必须包含 chunks_list，用于 adelete_by_doc_id）
     # ================================================================
     await rag.doc_status.upsert({
         source_id: {
@@ -167,6 +176,7 @@ async def a_direct_ingest(
             "created_at": time.time(),
             "updated_at": time.time(),
             "track_id": source_id,
+            "chunks_list": list(chunks_data.keys()),
         }
     })
 

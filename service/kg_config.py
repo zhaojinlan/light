@@ -276,7 +276,7 @@ def create_lightrag_neo4j_qdrant(
     Example:
         >>> from service.kg_config import create_lightrag_neo4j_qdrant
         >>> rag = create_lightrag_neo4j_qdrant()
-        >>> rag.insert("铜合金CuNiSi具有优异的导电性...")
+        >>> rag.insert("张某以虚构投资平台为由骗取他人财物...")
         >>> rag._persistent_loop.close()  # 使用完毕后释放资源
     """
     load_env(env_path)
@@ -294,8 +294,8 @@ def create_lightrag_neo4j_qdrant(
         # 存储后端配置
         graph_storage="Neo4JStorage",
         vector_storage="QdrantVectorDBStorage",
-        kv_storage="JsonKVStorage",
-        doc_status_storage="JsonDocStatusStorage",
+        kv_storage="MongoKVStorage",
+        doc_status_storage="MongoDocStatusStorage",
         # LLM 配置
         llm_model_func=build_llm_func(),
         llm_model_name=os.getenv("LLM_MODEL", "Qwen3-235B-A22B-Instruct"),
