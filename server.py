@@ -62,6 +62,31 @@ class SetIsanalysisRequest(BaseModel):
     isanalysis: bool = True
 
 
+class RetrievalQueryRequest(BaseModel):
+    question: str
+    mode: str = "mix"
+    response_type: str = "Multiple Paragraphs"
+    top_k: int = 10
+
+
+class RetrievalDataRequest(BaseModel):
+    question: str
+    mode: str = "mix"
+    top_k: int = 10
+
+
+class BM25RetrievalRequest(BaseModel):
+    question: str
+    top_k: int = 10
+    dense_weight: float = 0.5
+    bm25_weight: float = 0.5
+
+
+class PreventionRequest(BaseModel):
+    query: str | None = None
+    top_k: int = 20
+
+
 # ============================================================
 # FastAPI 应用
 # ============================================================
@@ -302,6 +327,121 @@ async def kg_search(q: str, top_k: int = 10):
         return result
     except Exception as e:
         logger.error("KG search error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================
+# 检索端点 — RAG问答 / 向量检索 / BM25混合 / 防范建议
+# ============================================================
+
+
+@app.post("/api/v1/retrieval/query")
+async def retrieval_query(req: RetrievalQueryRequest):
+    """RAG 知识图谱问答（经过 LLM 生成）。
+
+    支持 5 种检索模式：
+      - local: 局部实体上下文检索
+      - global: 全局知识检索
+      - hybrid: local + global
+      - naive: 简单向量搜索
+      - mix: KG + 向量混合（推荐）
+    """
+    from service.query_service import QueryService
+
+    svc = QueryService(rag=app.state.rag)
+    try:
+        answer = svc.query(
+            question=req.question,
+            mode=req.mode,
+            response_type=req.response_type,
+            top_k=req.top_k,
+        )
+        return {
+            "answer": answer,
+            "question": req.question,
+            "mode": req.mode,
+        }
+    except Exception as e:
+        logger.error("Retrieval query error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/retrieval/query_data")
+async def retrieval_query_data(req: RetrievalDataRequest):
+    """纯数据检索，不经过 LLM 生成。
+
+    返回结构化结果：entities / relationships / chunks / references。
+    """
+    from service.query_service import QueryService
+
+    svc = QueryService(rag=app.state.rag)
+    try:
+        data = svc.query_data(
+            question=req.question,
+            mode=req.mode,
+            top_k=req.top_k,
+        )
+        return data
+    except Exception as e:
+        logger.error("Retrieval query_data error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/retrieval/bm25")
+async def retrieval_bm25(req: BM25RetrievalRequest):
+    """Dense 向量 + BM25 稀疏向量混合检索（RRF 融合）。
+
+    不经过 LLM，返回原始 chunk 列表及其 RRF 融合分数。
+    """
+    from service.query_service import QueryService
+
+    svc = QueryService(rag=app.state.rag)
+    try:
+        result = svc.query_with_bm25(
+            question=req.question,
+            top_k=req.top_k,
+            dense_weight=req.dense_weight,
+            bm25_weight=req.bm25_weight,
+        )
+        return result
+    except Exception as e:
+        logger.error("BM25 retrieval error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/retrieval/by-type/{entity_type}")
+async def retrieval_by_type(entity_type: str, top_k: int = 50):
+    """按实体类型从向量库检索。
+
+    类型: FraudScenario / FraudFeature / FraudMethod /
+          PreventionMeasure / LawRegulation / RelatedCase / summary
+    """
+    from service.query_service import QueryService
+
+    svc = QueryService(rag=app.state.rag)
+    try:
+        items = svc.query_by_entity_type(entity_type, top_k=top_k)
+        return {"items": items, "entity_type": entity_type, "count": len(items)}
+    except Exception as e:
+        logger.error("Retrieval by-type error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/retrieval/prevention")
+async def retrieval_prevention(req: PreventionRequest):
+    """防范措施检索。
+
+    先查向量库获取所有 PreventionMeasure 实体，
+    如有 query 则用 BM25 混合检索按相关性排序。
+    """
+    from service.query_service import QueryService
+
+    svc = QueryService(rag=app.state.rag)
+    try:
+        items = svc.query_prevention(query=req.query, top_k=req.top_k)
+        return {"items": items, "query": req.query, "count": len(items)}
+    except Exception as e:
+        logger.error("Prevention retrieval error: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 
