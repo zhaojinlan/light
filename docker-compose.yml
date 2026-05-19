@@ -2,7 +2,7 @@ services:
   # Neo4j — 图数据库，内置 APOC 插件
   neo4j:
     image: neo4j:5.26-community
-    container_name: lightrag-neo4j
+    container_name: reco-lightrag-neo4j
     ports:
       - "7474:7474"   # Browser UI
       - "7687:7687"   # Bolt 协议连接
@@ -29,7 +29,7 @@ services:
   # Qdrant — 向量数据库
   qdrant:
     image: qdrant/qdrant:v1.12.5
-    container_name: lightrag-qdrant
+    container_name: reco-lightrag-qdrant
     ports:
       - "6333:6333"   # REST API
       - "6334:6334"   # gRPC
@@ -40,7 +40,7 @@ services:
     networks:
       - lightrag-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/6333'"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -48,7 +48,7 @@ services:
   # MongoDB — 文档 KV 存储
   mongo:
     image: mongo:7
-    container_name: lightrag-mongo
+    container_name: reco-lightrag-mongo
     ports:
       - "27017:27017"
     environment:
@@ -63,6 +63,36 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  # LightRAG HTTP 服务
+  lightserver:
+    build: .
+    container_name: reco-lightserver
+    ports:
+      - "8001:8001"
+    env_file:
+      - docker.env
+    environment:
+      # 覆盖 docker.env 中的 localhost 为容器网络名
+      - NEO4J_URI=bolt://neo4j:7687
+      - QDRANT_URL=http://qdrant:6333
+      - MONGO_URI=mongodb://mongouser:LightRAG2026Mongo!@mongo:27017/
+    volumes:
+      - ./rag_storage:/app/rag_storage
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lightrag-net
 
 volumes:
   neo4j_data:
