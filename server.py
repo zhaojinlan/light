@@ -205,7 +205,7 @@ async def get_kg_graph(
         nodes = [
             {
                 "id": n.id,
-                "label": n.label,
+                "label": n.properties.get("entity_name", n.id),
                 "entity_type": n.properties.get("entity_type", ""),
                 "description": n.properties.get("description", ""),
             }
