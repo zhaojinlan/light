@@ -309,8 +309,8 @@ def create_lightrag_neo4j_qdrant(
             "entity_types": _ENTITY_TYPES,
         },
         # 分块参数
-        chunk_token_size=1200,
-        chunk_overlap_token_size=100,
+        chunk_token_size=2400,
+        chunk_overlap_token_size=200,
         **extra_kwargs,
     )
 

@@ -3,8 +3,8 @@
 在 Qdrant dense 向量检索基础上，增加 BM25 稀疏向量关键词匹配检索。
 通过 RRF（Reciprocal Rank Fusion）融合 dense 和 BM25 的检索结果。
 
-注意：需要 Qdrant 服务端与客户端版本兼容。当前 qdrant-client 1.17.1
-与 Qdrant server 1.12.5 存在不兼容问题，BM25 索引会自动降级为 dense 检索。
+注意：需要 Qdrant 服务端（>=1.13.0）与客户端版本兼容。若版本不匹配，
+BM25 索引会自动降级为纯 dense 检索。
 """
 
 import logging

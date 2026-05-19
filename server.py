@@ -127,31 +127,34 @@ async def _run_insert(task_id: str, text: str, doc_id: str, file_path: str):
         tasks[task_id]["status"] = TaskStatus.PROCESSING
 
         def _insert_sync():
-            from service.document_service import DocumentService
+            from service.custom_entity_service import CustomEntityService
 
-            svc = DocumentService(rag=app.state.rag)
-            return svc.insert(
+            svc = CustomEntityService(rag=app.state.rag)
+            result = svc.insert_with_custom_schema(
                 text=text,
-                ids=doc_id,
-                file_paths=file_path if file_path else None,
+                doc_id=doc_id,
+                file_path=file_path if file_path else "custom_kg",
             )
+            return {
+                "track_id": result.get("doc_id", doc_id),
+                "entity_count": len(result.get("entities", [])),
+                "relation_count": len(result.get("relationships", [])),
+            }
 
         # 在线程池中执行同步的 insert
-        track_id = await asyncio.to_thread(_insert_sync)
+        insert_result = await asyncio.to_thread(_insert_sync)
 
-        # 获取实体/关系统计
-        result = {"entity_count": 0, "relation_count": 0, "track_id": track_id}
-
-        try:
-            stats = app.state.rag.get_processing_status()
-            result["entity_count"] = stats.get("processed", 0)
-            result["relation_count"] = 0
-        except Exception:
-            logger.warning("Failed to get processing stats for task %s", task_id)
+        track_id = insert_result.get("track_id", doc_id)
+        result = {
+            "entity_count": insert_result.get("entity_count", 0),
+            "relation_count": insert_result.get("relation_count", 0),
+            "track_id": track_id,
+        }
 
         tasks[task_id]["status"] = TaskStatus.COMPLETED
         tasks[task_id]["result"] = result
-        logger.info("Task %s completed: track_id=%s", task_id, track_id)
+        logger.info("Task %s completed: track_id=%s, entities=%d, relations=%d",
+                    task_id, track_id, result["entity_count"], result["relation_count"])
 
     except Exception as e:
         logger.error("Task %s failed: %s", task_id, e, exc_info=True)
@@ -164,7 +167,17 @@ async def set_doc_isanalysis(req: SetIsanalysisRequest):
     """设置 MongoDB doc_status 中某条文档记录的 isanalysis 字段。"""
     rag = app.state.rag
     try:
-        await rag.doc_status.upsert({req.doc_id: {"isanalysis": req.isanalysis}})
+        # MongoDB client 绑定在 _PersistentLoop 线程上，
+        # 需要将协程提交到该循环执行，避免事件循环冲突
+        if hasattr(rag, "_persistent_loop") and rag._persistent_loop is not None:
+            ploop = rag._persistent_loop
+            future = asyncio.run_coroutine_threadsafe(
+                rag.doc_status.upsert({req.doc_id: {"isanalysis": req.isanalysis}}),
+                ploop._loop,
+            )
+            await asyncio.wrap_future(future)
+        else:
+            await rag.doc_status.upsert({req.doc_id: {"isanalysis": req.isanalysis}})
         logger.info("Set isanalysis=%s for doc_id=%s", req.isanalysis, req.doc_id)
         return {"status": "ok"}
     except Exception as e:

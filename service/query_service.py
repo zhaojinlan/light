@@ -598,7 +598,7 @@ class QueryService:
 
         # 从 Neo4j 执行最短路径 Cypher 查询
         cypher = """
-        MATCH (src {entity_id: $src}), (tgt {entity_id: $tgt})
+        MATCH (src:base {entity_name: $src}), (tgt:base {entity_name: $tgt})
         MATCH path = shortestPath((src)-[*1..$max_depth]-(tgt))
         RETURN path
         LIMIT 1
@@ -626,7 +626,7 @@ class QueryService:
 
                 for node in path.nodes:
                     nodes.append({
-                        "entity_name": dict(node).get("entity_id", ""),
+                        "entity_name": dict(node).get("entity_name", ""),
                         "entity_type": dict(node).get("entity_type", ""),
                         "description": dict(node).get("description", ""),
                     })
@@ -634,8 +634,8 @@ class QueryService:
                 for rel in path.relationships:
                     edges.append({
                         "relation_type": rel.type,
-                        "source": dict(rel).get("source_id", ""),
-                        "target": dict(rel).get("target_id", ""),
+                        "source": rel.start_node.get("entity_name", ""),
+                        "target": rel.end_node.get("entity_name", ""),
                         "description": dict(rel).get("description", ""),
                     })
 
@@ -666,7 +666,7 @@ class QueryService:
             ...     print(f"邻居数: {len(nb['neighbors'])}")
         """
         cypher = """
-        MATCH (center {entity_id: $name})
+        MATCH (center:base {entity_name: $name})
         MATCH path = (center)-[*1..$depth]-(neighbor)
         WHERE neighbor <> center
         RETURN DISTINCT neighbor, relationships(path) AS rels
@@ -689,7 +689,7 @@ class QueryService:
                 if not records:
                     # 检查中心实体是否存在
                     center_exists = session.run(
-                        "MATCH (n {entity_id: $name}) RETURN count(n) as cnt",
+                        "MATCH (n:base {entity_name: $name}) RETURN count(n) as cnt",
                         name=entity_name,
                     ).single()["cnt"]
                     if center_exists == 0:
@@ -702,7 +702,7 @@ class QueryService:
 
                 for record in records:
                     node = dict(record["neighbor"])
-                    neighbor_name = node.get("entity_id", "")
+                    neighbor_name = node.get("entity_name", "")
                     if neighbor_name:
                         neighbors[neighbor_name] = {
                             "entity_name": neighbor_name,
@@ -710,8 +710,8 @@ class QueryService:
                             "description": node.get("description", ""),
                         }
                     for rel in record["rels"]:
-                        src = dict(rel).get("source_id", "")
-                        tgt = dict(rel).get("target_id", "")
+                        src = rel.start_node.get("entity_name", "")
+                        tgt = rel.end_node.get("entity_name", "")
                         edge_key = (src, tgt, rel.type)
                         if edge_key not in edge_set:
                             edge_set.add(edge_key)
