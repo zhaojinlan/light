@@ -19,7 +19,10 @@
 """
 
 import asyncio
+import logging
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 from lightrag import LightRAG, QueryParam
 from lightrag.types import KnowledgeGraph
@@ -223,8 +226,7 @@ class QueryService:
     ) -> list[dict[str, Any]]:
         """按实体类型检索实体。
 
-        从 entities_vdb 中获取指定类型的所有实体信息。
-        适用于按类别浏览图谱内容，如获取所有诈骗手法、防范措施等。
+        通过 Neo4j 图数据库查询（实体类型是图节点的属性，不由 Qdrant 管理）。
 
         Args:
             entity_type: 实体类型，可选值：
@@ -246,49 +248,63 @@ class QueryService:
             >>> for m in methods:
             ...     print(m["entity_name"])
         """
-        results = self._run_async(
-            self.rag.entities_vdb.query("", top_k=top_k)
-        )
-        return [
-            {
-                "entity_name": item.get("entity_name", ""),
-                "description": item.get("description", ""),
-                "entity_type": item.get("entity_type", ""),
-            }
-            for item in results
-            if item.get("entity_type") == entity_type
-        ]
+        graph = self.rag.chunk_entity_relation_graph
+        all_nodes = self._run_async(graph.get_all_nodes())
+
+        results = []
+        for node in all_nodes:
+            etype = node.get("entity_type", "")
+            if etype != entity_type:
+                continue
+            name = node.get("entity_id", "") or node.get("entity_name", "")
+            if not name:
+                continue
+            results.append({
+                "entity_name": name,
+                "description": node.get("description", ""),
+                "entity_type": etype,
+            })
+            if len(results) >= top_k:
+                break
+
+        return results
 
     def query_case_summary(self, doc_id: str | None = None) -> list[dict[str, Any]]:
         """获取已入库案件的 summary 实体（案件简要描述）。
 
-        summary 实体采用固定格式："{被告人身份+姓名}以{诈骗方式/理由}，
-        通过{具体手段}骗取{被害人}共计{金额}，被判处{刑罚+罚金}"，
-        用于快速查看案件基本信息（被告人、手法、金额、判决结果等）。
+        summary 实体以 doc_id 作为 entity_name，
+        description 字段存储完整的案件摘要文本。
         每个文书仅包含 1 个 summary 实体。
 
         Args:
             doc_id: 若指定则仅返回该文档关联的 summary，否则返回所有
 
         Returns:
-            summary 实体列表，每项包含 entity_name（摘要文本）、description（同摘要）、
+            summary 实体列表，每项包含 entity_name（doc_id）、description（完整摘要）、
             entity_type（"summary"）、source_id（文档 ID）
         """
-        results = self._run_async(
-            self.rag.entities_vdb.query("", top_k=1000)
-        )
-        summaries = [
-            {
-                "entity_name": item.get("entity_name", ""),
-                "description": item.get("description", ""),
-                "entity_type": item.get("entity_type", ""),
-                "source_id": item.get("source_id", ""),
-            }
-            for item in results
-            if item.get("entity_type") == "summary"
-        ]
+        graph = self.rag.chunk_entity_relation_graph
+        all_nodes = self._run_async(graph.get_all_nodes())
+
+        summaries = []
+        for node in all_nodes:
+            if node.get("entity_type") != "summary":
+                continue
+            name = node.get("entity_id", "") or node.get("entity_name", "")
+            if not name:
+                continue
+            summaries.append({
+                "entity_name": name,
+                "description": node.get("description", ""),
+                "entity_type": "summary",
+                "source_id": node.get("source_id", ""),
+            })
+
         if doc_id:
-            summaries = [s for s in summaries if s.get("source_id") == doc_id]
+            summaries = [
+                s for s in summaries
+                if s.get("source_id") == doc_id or s.get("entity_name") == doc_id
+            ]
         return summaries
 
     def query_similar_cases(
@@ -321,22 +337,43 @@ class QueryService:
         """
         chunks = self.query_with_bm25(question, top_k=top_k)["chunks"]
 
-        # 从相关 chunk 中提取关联的 summary 和 related_case
-        source_ids = set()
+        # 从相关 chunk 中提取文档标识
+        # chunk payload 中可能使用 full_doc_id 或 source_id
+        doc_ids = set()
         for chunk in chunks:
-            sid = chunk.get("payload", {}).get("source_id", "")
-            if sid:
-                source_ids.add(sid)
+            payload = chunk.get("payload", {})
+            did = payload.get("source_id") or payload.get("full_doc_id", "")
+            if did:
+                doc_ids.add(did)
+
+        # 提取文档标识中的关键词（如诈骗场景类型）
+        # full_doc_id 格式如 "冒充公检法类诈骗/冒充公检法类诈骗 -案例三"
+        key_terms = set()
+        for did in doc_ids:
+            # 取 "/" 前面的部分（诈骗场景类型）
+            key_terms.add(did.split("/")[0] if "/" in did else did)
+            # 也取整个 ID 的前几个字符
+            key_terms.add(did[:6])
 
         summaries = self.query_case_summary()
-        matched_summaries = [
-            s for s in summaries if s.get("source_id") in source_ids
-        ]
+        # 匹配：summary 的 source_id 在 doc_ids 中，或 entity_name 包含关键词
+        matched_summaries = []
+        for s in summaries:
+            if s.get("source_id") in doc_ids:
+                matched_summaries.append(s)
+                continue
+            name = s.get("entity_name", "")
+            if any(kt in name for kt in key_terms if len(kt) >= 3):
+                matched_summaries.append(s)
 
         related_cases = self.query_related_cases()
-        matched_cases = [
-            c for c in related_cases if c.get("source_id") in source_ids
-        ]
+        # 对 related_cases 使用同样的匹配逻辑
+        # 注意: query_by_entity_type 不返回 source_id，所以只能用关键词匹配
+        matched_cases = []
+        for c in related_cases:
+            name = c.get("entity_name", "")
+            if any(kt in name for kt in key_terms if len(kt) >= 3):
+                matched_cases.append(c)
 
         return {
             "chunks": chunks,
@@ -369,35 +406,58 @@ class QueryService:
             >>> for item in items:
             ...     print(item["entity_name"], "-", item["description"])
         """
-        # 获取所有防范措施实体
-        all_entities = self._run_async(
-            self.rag.entities_vdb.query("", top_k=top_k)
-        )
-        preventions = [
-            item for item in all_entities
-            if item.get("entity_type") == "PreventionMeasure"
-        ]
+        # 从 Neo4j 图数据库获取所有 PreventionMeasure 实体
+        graph = self.rag.chunk_entity_relation_graph
+        all_nodes = self._run_async(graph.get_all_nodes())
 
-        # 如果有查询条件，用 BM25 混合检索排序
-        if query:
-            bm25_results = self.query_with_bm25(query, top_k=top_k)
-            bm25_content_ids = {c.get("content", "") for c in bm25_results.get("chunks", [])}
-
-            # 对防范措施按相关性排序：与 BM25 结果内容匹配的排前面
-            def _score(p):
-                desc = p.get("description", "")
-                return 1.0 if any(desc in c or c in desc for c in bm25_content_ids) else 0.0
-
-            preventions = sorted(preventions, key=_score, reverse=True)
-
-        return [
-            {
-                "entity_name": item.get("entity_name", ""),
-                "description": item.get("description", ""),
+        preventions = []
+        for node in all_nodes:
+            if node.get("entity_type") != "PreventionMeasure":
+                continue
+            name = node.get("entity_id", "") or node.get("entity_name", "")
+            if not name:
+                continue
+            preventions.append({
+                "entity_name": name,
+                "description": node.get("description", ""),
                 "entity_type": "PreventionMeasure",
-            }
-            for item in preventions
-        ]
+            })
+
+        # 如果有查询条件，用 entities_vdb 语义搜索排序
+        if query and preventions:
+            results = self._run_async(
+                self.rag.entities_vdb.query(query, top_k=top_k)
+            )
+            scored = {}
+            for r in results:
+                ename = r.get("entity_name", "")
+                scored[ename] = r.get("similarity", 0)
+
+            def _score(p):
+                return scored.get(p.get("entity_name", ""), 0.0)
+
+            # 尝试用语义分数排序和过滤
+            scored_preventions = [(p, _score(p)) for p in preventions]
+            scored_preventions = [p for p in scored_preventions if p[1] > 0]
+
+            if scored_preventions:
+                scored_preventions.sort(key=lambda x: x[1], reverse=True)
+                preventions = [p for p, _ in scored_preventions]
+            else:
+                # 语义搜索无结果，fallback 到关键词匹配
+                # 将查询拆分为双字组合进行模糊匹配
+                query_lower = query.lower()
+                query_bigrams = [query_lower[i:i+2] for i in range(len(query_lower) - 1)]
+                keyword_matched = []
+                for p in preventions:
+                    name_lower = p.get("entity_name", "").lower()
+                    desc_lower = p.get("description", "").lower()
+                    # 如果查询中的任意双字组合出现在名称或描述中，则视为匹配
+                    if any(bigram in name_lower or bigram in desc_lower for bigram in query_bigrams):
+                        keyword_matched.append(p)
+                preventions = keyword_matched
+
+        return preventions[:top_k]
 
     # ============================================================
     # 按实体类型快捷查询
@@ -597,26 +657,27 @@ class QueryService:
             return None
 
         # 从 Neo4j 执行最短路径 Cypher 查询
-        cypher = """
-        MATCH (src:base {entity_name: $src}), (tgt:base {entity_name: $tgt})
-        MATCH path = shortestPath((src)-[*1..$max_depth]-(tgt))
+        # 注意：Neo4j 不支持在 shortestPath 的路径模式中使用参数，需内联字面量
+        cypher = f"""
+        MATCH (src:base {{entity_name: $src}}), (tgt:base {{entity_name: $tgt}})
+        MATCH path = shortestPath((src)-[*1..{max_depth}]-(tgt))
         RETURN path
         LIMIT 1
         """
-        params = {"src": src_entity, "tgt": tgt_entity, "max_depth": max_depth}
+        params = {"src": src_entity, "tgt": tgt_entity}
 
         graph = self.rag.chunk_entity_relation_graph
         driver = graph._driver
         database = getattr(graph, "_DATABASE", "neo4j")
 
-        def _execute():
+        async def _execute():
             import neo4j
 
-            with driver.session(
+            async with driver.session(
                 database=database, default_access_mode=neo4j.READ_ACCESS
             ) as session:
-                result = session.run(cypher, params)
-                record = result.single()
+                result = await session.run(cypher, params)
+                record = await result.single()
                 if not record:
                     return None
 
@@ -641,7 +702,7 @@ class QueryService:
 
                 return {"nodes": nodes, "edges": edges}
 
-        return self._run_async(asyncio.to_thread(_execute))
+        return self._run_async(_execute())
 
     def get_entity_neighbors(
         self,
@@ -665,34 +726,36 @@ class QueryService:
             ...     print(f"中心: {nb['center']}")
             ...     print(f"邻居数: {len(nb['neighbors'])}")
         """
-        cypher = """
-        MATCH (center:base {entity_name: $name})
-        MATCH path = (center)-[*1..$depth]-(neighbor)
+        # 注意：Neo4j 不支持在路径模式中使用参数表示深度，需内联字面量
+        cypher = f"""
+        MATCH (center:base {{entity_name: $name}})
+        MATCH path = (center)-[*1..{depth}]-(neighbor)
         WHERE neighbor <> center
         RETURN DISTINCT neighbor, relationships(path) AS rels
         LIMIT 500
         """
-        params = {"name": entity_name, "depth": depth}
+        params = {"name": entity_name}
 
         graph = self.rag.chunk_entity_relation_graph
         driver = graph._driver
         database = getattr(graph, "_DATABASE", "neo4j")
 
-        def _execute():
+        async def _execute():
             import neo4j
 
-            with driver.session(
+            async with driver.session(
                 database=database, default_access_mode=neo4j.READ_ACCESS
             ) as session:
-                result = session.run(cypher, params)
-                records = list(result)
+                result = await session.run(cypher, params)
+                records = [r async for r in result]
                 if not records:
                     # 检查中心实体是否存在
-                    center_exists = session.run(
+                    center_check = await session.run(
                         "MATCH (n:base {entity_name: $name}) RETURN count(n) as cnt",
                         name=entity_name,
-                    ).single()["cnt"]
-                    if center_exists == 0:
+                    )
+                    center_record = await center_check.single()
+                    if center_record["cnt"] == 0:
                         return None
                     return {"center": entity_name, "neighbors": [], "edges": []}
 
@@ -727,4 +790,4 @@ class QueryService:
                     "edges": edges,
                 }
 
-        return self._run_async(asyncio.to_thread(_execute))
+        return self._run_async(_execute())

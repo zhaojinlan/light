@@ -160,6 +160,13 @@ class _PersistentLoop:
 
     def close(self):
         """停止事件循环并清理资源。"""
+        # 清除 MongoDB ClientManager 单例，避免下次初始化时复用旧事件循环的客户端
+        try:
+            from lightrag.kg.mongo_impl import ClientManager
+            ClientManager._instances = {"db": None, "ref_count": 0}
+        except ImportError:
+            pass
+
         if self._loop is not None and self._loop.is_running():
             # Cancel all pending tasks before stopping
             pending = asyncio.all_tasks(self._loop)

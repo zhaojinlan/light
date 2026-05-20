@@ -376,12 +376,16 @@ async def retrieval_query_data(req: RetrievalDataRequest):
 
     svc = QueryService(rag=app.state.rag)
     try:
-        data = svc.query_data(
+        result = svc.query_data(
             question=req.question,
             mode=req.mode,
             top_k=req.top_k,
         )
-        return data
+        # LightRAG may wrap the response as {"status": "...", "data": {...}}
+        # Unwrap to return the actual data at top level
+        if isinstance(result, dict) and "data" in result:
+            return result["data"]
+        return result
     except Exception as e:
         logger.error("Retrieval query_data error: %s", e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))

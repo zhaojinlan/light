@@ -82,11 +82,10 @@ class BM25RetrievalService:
                 f"  [BM25] 已为 '{self._collection_name}' 创建 BM25 sparse vector 索引"
             )
         except Exception as e:
-            logger.warning("BM25 sparse vector 索引不可用: %s", e)
+            logger.info("BM25 sparse vector 索引不可用（Qdrant 不支持动态添加 sparse vector），降级为纯 dense 检索: %s", e)
             self._sparse_enabled = False
             print(
-                f"  [BM25] sparse vector 索引不可用（{e}），"
-                f"将使用纯 dense 向量检索"
+                f"  [BM25] sparse vector 索引不可用，将使用纯 dense 向量检索"
             )
 
     def index_chunk_bm25(self, chunk_id: str, text: str):
@@ -225,20 +224,31 @@ class BM25RetrievalService:
         if not dense_hits and not bm25_hits:
             return []
         if not bm25_hits:
-            # 无 BM25 结果，直接返回 dense 结果
+            # 无 BM25 结果，用 dense 结果计算 RRF 分数
             results = []
-            for p in dense_hits:
+            for rank, p in enumerate(dense_hits):
                 results.append({
                     "id": p["id"],
                     "payload": p["payload"],
                     "content": p["payload"].get("content", ""),
-                    "score": p["score"],
+                    "rrf_score": 1.0 / (60 + rank + 1),
+                    "rank": rank + 1,
                 })
             return results[:top_k]
         if not dense_hits:
-            return bm25_hits
+            # 无 dense 结果，用 BM25 结果计算 RRF 分数
+            results = []
+            for rank, p in enumerate(bm25_hits):
+                results.append({
+                    "id": p["id"],
+                    "payload": p["payload"],
+                    "content": p["payload"].get("content", ""),
+                    "rrf_score": 1.0 / (60 + rank + 1),
+                    "rank": rank + 1,
+                })
+            return results[:top_k]
 
-        # RRF 融合
+        # RRF 融合（dense + BM25 都有结果）
         dense_ranked = [p["id"] for p in dense_hits]
         bm25_ranked = [p["id"] for p in bm25_hits]
 
