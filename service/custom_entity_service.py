@@ -9,10 +9,17 @@
 """
 
 import json
+import logging
 import os
 from typing import Any
 
 from lightrag import LightRAG, QueryParam
+
+logger = logging.getLogger(__name__)
+
+
+class EntityParseError(Exception):
+    """LLM 返回内容无法解析为合法 JSON，文档应标记为 failed 并触发重试。"""
 
 from .kg_config import create_lightrag_neo4j_qdrant
 from .entity_disambiguation import EntityDisambiguationService, _run_async_on_rag
@@ -269,18 +276,29 @@ RELATION_EXTRACT_PROMPT = """你是法律判决文书（诈骗案件）知识图
 }}"""
 
 
-def _call_llm(prompt: str, rag: LightRAG) -> str:
+def _call_llm(prompt: str, rag: LightRAG, timeout: float = 120) -> str:
     """通过 LightRAG 的 LLM 函数直接调用（不经过 RAG 检索）。
 
     Args:
         prompt: 完整的提示词
         rag: LightRAG 实例
+        timeout: 超时时间（秒），默认 120 秒
 
     Returns:
         LLM 返回的文本
+
+    Raises:
+        TimeoutError: LLM 调用超时
     """
+    import concurrent.futures
+
     param = QueryParam(mode="bypass")
-    return rag.query(prompt, param)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(rag.query, prompt, param)
+        try:
+            return future.result(timeout=timeout)
+        except concurrent.futures.TimeoutError:
+            raise TimeoutError(f"LLM 调用超时 ({timeout}s)，请检查模型 API 是否正常")
 
 
 def _parse_json_response(text: str) -> dict:
@@ -295,7 +313,7 @@ def _parse_json_response(text: str) -> dict:
         解析后的 JSON 字典
     """
     if not text or not isinstance(text, str):
-        return {}
+        raise EntityParseError("LLM 返回内容为空或非字符串类型")
 
     # 尝试直接解析
     try:
@@ -321,7 +339,10 @@ def _parse_json_response(text: str) -> dict:
         except json.JSONDecodeError:
             pass
 
-    return {}
+    raise EntityParseError(
+        f"无法解析模型返回的 JSON（已尝试直接解析、markdown提取、大括号提取），"
+        f"响应预览: {text[:300]}"
+    )
 
 
 def extract_entities(text: str, rag: LightRAG) -> list[dict[str, Any]]:
@@ -586,7 +607,7 @@ class CustomEntityService:
                     existing_names.add(name)
             print(f"  消歧: 图谱中已有 {len(existing_names)} 个实体")
         except Exception as e:
-            print(f"  消歧: 获取已有实体失败 ({e})，跳过精确匹配，仅做相似度检测")
+            logger.warning("消歧: 获取已有实体失败 (%s)，跳过精确匹配，仅做相似度检测", e)
 
         # 精确匹配去重 + embedding 相似度消歧
         deduped_entities = []

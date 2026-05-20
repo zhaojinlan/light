@@ -155,10 +155,6 @@ class EntityDisambiguationService:
             "实体消歧: '%s' 与已有实体 '%s' 相似度 %.4f (类型: %s)，执行自动合并",
             entity_name, source_entity, best["score"], entity_type,
         )
-        print(
-            f"  [实体消歧] '{entity_name}' 与已有实体 '{source_entity}' "
-            f"相似度 {best['score']:.4f} (类型: {entity_type})，执行自动合并"
-        )
 
         try:
             merge_result = _run_async_on_rag(
@@ -169,13 +165,7 @@ class EntityDisambiguationService:
                 ),
             )
             logger.info("实体消歧: 合并成功，'%s' 已并入 '%s'", source_entity, entity_name)
-            print(
-                f"  [实体消歧] 合并成功: '{source_entity}' 已并入 '{entity_name}'"
-            )
             return True
         except Exception as e:
             logger.warning("实体消歧: 合并失败 (%s)，保留两个独立实体", e)
-            print(
-                f"  [实体消歧] 合并失败 ({e})，保留两个独立实体"
-            )
             return False

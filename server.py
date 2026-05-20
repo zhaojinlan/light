@@ -38,7 +38,7 @@ async def _get_redis() -> Redis:
     """获取 Redis 连接（延迟初始化）。"""
     global _redis
     if _redis is None:
-        _redis = Redis.from_url(os.getenv("REDIS_URI", "redis://localhost:6379/1"), decode_responses=True)
+        _redis = Redis.from_url(os.getenv("REDIS_URI", "redis://localhost:6379/0"), decode_responses=True)
     return _redis
 
 
@@ -133,6 +133,32 @@ async def analyze(req: AnalyzeRequest):
     return AnalyzeResponse(task_id=task_id)
 
 
+async def _push_to_redis_stream(fields: dict, max_retries: int = 3) -> None:
+    """推送结果到 Redis Stream，失败时指数退避重试。
+
+    Args:
+        fields: 要推送的字段字典
+        max_retries: 最大重试次数，默认 3 次
+
+    Raises:
+        Exception: 所有重试均失败时抛出最后一次的异常
+    """
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            redis = await _get_redis()
+            await redis.xadd(REDIS_DOC_STREAM, fields)
+            return
+        except Exception as e:
+            last_error = e
+            if attempt < max_retries - 1:
+                delay = 2 ** attempt
+                logger.warning("Redis 推送失败(第%d次), %ds 后重试: %s", attempt + 1, delay, e)
+                await asyncio.sleep(delay)
+    logger.critical("Redis 推送结果失败(重试%d次): %s", max_retries, last_error)
+    raise last_error
+
+
 async def _run_insert(task_id: str, text: str, doc_id: str, file_path: str):
     """在后台执行 LightRAG insert 操作，完成后通过 Redis Stream 推送结果。"""
     try:
@@ -161,35 +187,27 @@ async def _run_insert(task_id: str, text: str, doc_id: str, file_path: str):
         logger.info("Task %s completed: track_id=%s, entities=%d, relations=%d",
                     task_id, track_id, entity_count, relation_count)
 
-        # 推送结果到 Redis Stream
-        redis = await _get_redis()
-        await redis.xadd(
-            REDIS_DOC_STREAM,
-            {
-                "task_id": task_id,
-                "status": "completed",
-                "entity_count": str(entity_count),
-                "relation_count": str(relation_count),
-            },
-        )
+        # 推送结果到 Redis Stream（带重试）
+        await _push_to_redis_stream({
+            "task_id": task_id,
+            "status": "completed",
+            "entity_count": str(entity_count),
+            "relation_count": str(relation_count),
+        })
         logger.info("Result pushed to Redis Stream '%s'", REDIS_DOC_STREAM)
 
     except Exception as e:
         logger.error("Task %s failed: %s", task_id, e, exc_info=True)
 
-        # 推送失败结果到 Redis Stream
+        # 推送失败结果到 Redis Stream（带重试）
         try:
-            redis = await _get_redis()
-            await redis.xadd(
-                REDIS_DOC_STREAM,
-                {
-                    "task_id": task_id,
-                    "status": "failed",
-                    "error": str(e),
-                },
-            )
+            await _push_to_redis_stream({
+                "task_id": task_id,
+                "status": "failed",
+                "error": str(e),
+            })
         except Exception as redis_err:
-            logger.error("Failed to push error result to Redis: %s", redis_err)
+            logger.critical("无法推送失败结果到 Redis，文档 %s 将永久卡在 processing: %s", task_id, redis_err)
 
 
 @app.post("/api/v1/doc/set-isanalysis")

@@ -57,7 +57,7 @@ services:
       # 覆盖 docker.env 中的 localhost 为容器网络名
       - NEO4J_URI=bolt://neo4j:7687
       - QDRANT_URL=http://qdrant:6333
-      - REDIS_URI=redis://host.docker.internal:6379/1
+      - REDIS_URI=redis://host.docker.internal:6379/0
     volumes:
       - ./rag_storage:/app/rag_storage
     depends_on:
