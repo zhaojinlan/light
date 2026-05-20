@@ -660,7 +660,7 @@ class CustomEntityService:
         return self.rag.query(question, param)
 
     def delete_by_doc_id(self, doc_id: str) -> dict:
-        """按文档 ID 删除文档及其所有关联数据（Neo4j + Qdrant + MongoDB）。"""
+        """按文档 ID 删除文档及其所有关联数据（Neo4j + Qdrant + Redis）。"""
         result = self.rag.delete_by_doc_id(doc_id)
         return {
             "status": getattr(result, "status", "ok"),

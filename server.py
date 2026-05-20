@@ -1,10 +1,12 @@
 """LightRAG HTTP 服务入口
 
 提供文档分析接口，供主项目通过 HTTP 调用。
+处理完成后通过 Redis Stream 异步回调结果。
 """
 
 import asyncio
 import logging
+import os
 import sys
 import uuid
 from contextlib import asynccontextmanager
@@ -12,6 +14,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from redis.asyncio import Redis
 
 logger = logging.getLogger("lightserver")
 logging.basicConfig(
@@ -23,17 +26,20 @@ logging.basicConfig(
 sys.path.insert(0, str(Path(__file__).parent))
 
 # ============================================================
-# Task 状态跟踪（内存）
+# Redis Stream 配置
 # ============================================================
 
-tasks: dict[str, dict] = {}
+REDIS_DOC_STREAM = os.getenv("REDIS_DOC_STREAM", "doc:result")
+
+_redis: Redis | None = None
 
 
-class TaskStatus:
-    PENDING = "pending"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
+async def _get_redis() -> Redis:
+    """获取 Redis 连接（延迟初始化）。"""
+    global _redis
+    if _redis is None:
+        _redis = Redis.from_url(os.getenv("REDIS_URI", "redis://localhost:6379/1"), decode_responses=True)
+    return _redis
 
 
 # ============================================================
@@ -49,12 +55,6 @@ class AnalyzeRequest(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     task_id: str
-
-
-class StatusResponse(BaseModel):
-    status: str
-    result: dict | None = None
-    error: str | None = None
 
 
 class SetIsanalysisRequest(BaseModel):
@@ -97,7 +97,7 @@ async def lifespan(app: FastAPI):
     """启动时创建 LightRAG 实例，关闭时释放资源。"""
     from service.kg_config import create_lightrag_neo4j_qdrant
 
-    logger.info("Initializing LightRAG (Neo4j + Qdrant + MongoDB)...")
+    logger.info("Initializing LightRAG (Neo4j + Qdrant + Redis)...")
     rag = create_lightrag_neo4j_qdrant()
     app.state.rag = rag
     logger.info("LightRAG initialized successfully.")
@@ -106,6 +106,9 @@ async def lifespan(app: FastAPI):
     if hasattr(rag, "_persistent_loop"):
         rag._persistent_loop.close()
         logger.info("LightRAG resources released.")
+    if _redis is not None:
+        await _redis.aclose()
+        logger.info("Redis connection closed.")
 
 
 app = FastAPI(title="LightRAG Server", version="0.1.0", lifespan=lifespan)
@@ -118,39 +121,21 @@ async def health():
 
 @app.post("/api/v1/analyze", response_model=AnalyzeResponse)
 async def analyze(req: AnalyzeRequest):
-    """提交文档到 LightRAG 进行知识图谱构建。"""
-    task_id = str(uuid.uuid4())
-    tasks[task_id] = {
-        "status": TaskStatus.PENDING,
-        "result": None,
-        "error": None,
-    }
+    """提交文档到 LightRAG 进行知识图谱构建。
 
-    # 在后台线程执行耗时的 insert 操作
+    处理完成后通过 Redis Stream "doc:result" 异步回调结果。
+    """
+    task_id = str(uuid.uuid4())
+
+    # 在后台执行耗时的 insert 操作
     asyncio.create_task(_run_insert(task_id, req.text, req.doc_id, req.file_path))
 
     return AnalyzeResponse(task_id=task_id)
 
 
-@app.get("/api/v1/status/{task_id}", response_model=StatusResponse)
-async def get_status(task_id: str):
-    """查询文档处理任务状态。"""
-    if task_id not in tasks:
-        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-
-    task = tasks[task_id]
-    return StatusResponse(
-        status=task["status"],
-        result=task["result"],
-        error=task["error"],
-    )
-
-
 async def _run_insert(task_id: str, text: str, doc_id: str, file_path: str):
-    """在后台执行 LightRAG insert 操作。"""
+    """在后台执行 LightRAG insert 操作，完成后通过 Redis Stream 推送结果。"""
     try:
-        tasks[task_id]["status"] = TaskStatus.PROCESSING
-
         def _insert_sync():
             from service.custom_entity_service import CustomEntityService
 
@@ -170,39 +155,54 @@ async def _run_insert(task_id: str, text: str, doc_id: str, file_path: str):
         insert_result = await asyncio.to_thread(_insert_sync)
 
         track_id = insert_result.get("track_id", doc_id)
-        result = {
-            "entity_count": insert_result.get("entity_count", 0),
-            "relation_count": insert_result.get("relation_count", 0),
-            "track_id": track_id,
-        }
+        entity_count = insert_result.get("entity_count", 0)
+        relation_count = insert_result.get("relation_count", 0)
 
-        tasks[task_id]["status"] = TaskStatus.COMPLETED
-        tasks[task_id]["result"] = result
         logger.info("Task %s completed: track_id=%s, entities=%d, relations=%d",
-                    task_id, track_id, result["entity_count"], result["relation_count"])
+                    task_id, track_id, entity_count, relation_count)
+
+        # 推送结果到 Redis Stream
+        redis = await _get_redis()
+        await redis.xadd(
+            REDIS_DOC_STREAM,
+            {
+                "task_id": task_id,
+                "status": "completed",
+                "entity_count": str(entity_count),
+                "relation_count": str(relation_count),
+            },
+        )
+        logger.info("Result pushed to Redis Stream '%s'", REDIS_DOC_STREAM)
 
     except Exception as e:
         logger.error("Task %s failed: %s", task_id, e, exc_info=True)
-        tasks[task_id]["status"] = TaskStatus.FAILED
-        tasks[task_id]["error"] = str(e)
+
+        # 推送失败结果到 Redis Stream
+        try:
+            redis = await _get_redis()
+            await redis.xadd(
+                REDIS_DOC_STREAM,
+                {
+                    "task_id": task_id,
+                    "status": "failed",
+                    "error": str(e),
+                },
+            )
+        except Exception as redis_err:
+            logger.error("Failed to push error result to Redis: %s", redis_err)
 
 
 @app.post("/api/v1/doc/set-isanalysis")
 async def set_doc_isanalysis(req: SetIsanalysisRequest):
-    """设置 MongoDB doc_status 中某条文档记录的 isanalysis 字段。"""
+    """设置 doc_status 中某条文档记录的 isanalysis 字段（Redis KV 存储）。"""
     rag = app.state.rag
     try:
-        # MongoDB client 绑定在 _PersistentLoop 线程上，
-        # 需要将协程提交到该循环执行，避免事件循环冲突
-        if hasattr(rag, "_persistent_loop") and rag._persistent_loop is not None:
-            ploop = rag._persistent_loop
-            future = asyncio.run_coroutine_threadsafe(
-                rag.doc_status.upsert({req.doc_id: {"isanalysis": req.isanalysis}}),
-                ploop._loop,
-            )
-            await asyncio.wrap_future(future)
-        else:
-            await rag.doc_status.upsert({req.doc_id: {"isanalysis": req.isanalysis}})
+        ploop = rag._persistent_loop
+        future = asyncio.run_coroutine_threadsafe(
+            rag.doc_status.upsert({req.doc_id: {"isanalysis": req.isanalysis}}),
+            ploop._loop,
+        )
+        await asyncio.wrap_future(future)
         logger.info("Set isanalysis=%s for doc_id=%s", req.isanalysis, req.doc_id)
         return {"status": "ok"}
     except Exception as e:

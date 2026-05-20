@@ -1,6 +1,6 @@
-"""Neo4j + Qdrant 存储配置模块
+"""Neo4j + Qdrant + Redis 存储配置模块
 
-构建使用 Neo4j（图存储）和 Qdrant（向量存储）的 LightRAG 实例。
+构建使用 Neo4j（图存储）、Qdrant（向量存储）和 Redis（KV 存储）的 LightRAG 实例。
 环境变量从 docker.env 或 .env 文件读取。
 
 注意：Neo4j 和 Qdrant 等异步驱动的连接绑定到创建时的事件循环。
@@ -160,13 +160,6 @@ class _PersistentLoop:
 
     def close(self):
         """停止事件循环并清理资源。"""
-        # 清除 MongoDB ClientManager 单例，避免下次初始化时复用旧事件循环的客户端
-        try:
-            from lightrag.kg.mongo_impl import ClientManager
-            ClientManager._instances = {"db": None, "ref_count": 0}
-        except ImportError:
-            pass
-
         if self._loop is not None and self._loop.is_running():
             # Cancel all pending tasks before stopping
             pending = asyncio.all_tasks(self._loop)
@@ -260,18 +253,19 @@ def create_lightrag_neo4j_qdrant(
     workspace: str = "",
     **extra_kwargs: Any,
 ) -> LightRAG:
-    """创建使用 Neo4j 图存储 + Qdrant 向量存储的 LightRAG 实例。
+    """创建使用 Neo4j 图存储 + Qdrant 向量存储 + Redis KV 存储的 LightRAG 实例。
 
     该函数会：
     1. 加载环境变量（从 docker.env 或 .env）
     2. 构建 LLM / Embedding / Rerank 函数
     3. 配置 Neo4JStorage 作为图存储后端
     4. 配置 QdrantVectorDBStorage 作为向量存储后端
-    5. 启动持久事件循环并调用 initialize_storages()
-    6. 替换所有同步方法以使用持久循环
+    5. 配置 RedisKVStorage 作为 KV 存储后端
+    6. 启动持久事件循环并调用 initialize_storages()
+    7. 替换所有同步方法以使用持久循环
 
     Args:
-        working_dir: 本地缓存目录（KV 存储和文档状态使用 JSON 文件）
+        working_dir: 本地缓存目录
         env_path: 环境变量配置文件路径
         workspace: 工作空间标识，用于数据隔离
         **extra_kwargs: 其他 LightRAG 构造函数参数
@@ -301,8 +295,8 @@ def create_lightrag_neo4j_qdrant(
         # 存储后端配置
         graph_storage="Neo4JStorage",
         vector_storage="QdrantVectorDBStorage",
-        kv_storage="MongoKVStorage",
-        doc_status_storage="MongoDocStatusStorage",
+        kv_storage="RedisKVStorage",
+        doc_status_storage="RedisDocStatusStorage",
         # LLM 配置
         llm_model_func=build_llm_func(),
         llm_model_name=os.getenv("LLM_MODEL", "Qwen3-235B-A22B-Instruct"),

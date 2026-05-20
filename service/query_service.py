@@ -45,7 +45,7 @@ class QueryService:
         """初始化查询服务。
 
         Args:
-            rag: 已初始化的 LightRAG 实例。若为 None，则自动使用 Neo4j+Qdrant+MongoDB 存储创建
+            rag: 已初始化的 LightRAG 实例。若为 None，则自动使用 Neo4j+Qdrant+Redis 存储创建
         """
         self.rag = rag or create_lightrag_neo4j_qdrant()
 
