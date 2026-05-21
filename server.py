@@ -229,6 +229,44 @@ async def set_doc_isanalysis(req: SetIsanalysisRequest):
 
 
 # ============================================================
+# 知识图谱删除端点
+# ============================================================
+
+
+@app.delete("/api/v1/kg/doc/{doc_id}")
+async def delete_kg_doc(doc_id: str):
+    """删除文档关联的所有知识图谱数据（Neo4j + Qdrant + Redis）。
+
+    由主项目 app 的 DELETE /api/v1/documents/{id} 端点调用，
+    确保文档删除时知识图谱数据也被清理。
+    """
+    from service.custom_entity_service import CustomEntityService
+
+    rag = app.state.rag
+    svc = CustomEntityService(rag=rag)
+    try:
+        result = svc.delete_by_doc_id(doc_id)
+        status = result.get("status", "ok")
+        if status == "not_found":
+            return {
+                "status": "ok",
+                "doc_id": doc_id,
+                "detail": "doc_status not found, skipping KG cleanup",
+            }
+        return {"status": "ok", "doc_id": doc_id, "detail": result}
+    except Exception as e:
+        error_msg = str(e).lower()
+        if "not found" in error_msg or "not_found" in error_msg:
+            return {
+                "status": "ok",
+                "doc_id": doc_id,
+                "detail": "not found in KG, skipping",
+            }
+        logger.error("KG delete failed for doc %s: %s", doc_id, e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================
 # 知识图谱查询端点
 # ============================================================
 

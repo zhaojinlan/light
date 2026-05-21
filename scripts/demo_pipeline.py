@@ -1,13 +1,19 @@
-#!/usr/bin/env python
-"""端到端演示脚本：插入案例文档 -> 查询知识图谱。
+#!/usr/bin/env python3
+"""端到端批量上传脚本：将反诈案例全部通过主应用 API 上传。
+
+与前端上传单个 .md 文件的流程完全一致：
+  1. 登录获取 JWT token
+  2. 通过 POST /api/v1/documents/upload 上传每篇文档（multipart/form-data）
+  3. 后台 worker 自动从 MinIO 读取内容并提交到 lightserver 解析
+  4. 轮询文档列表直到全部处理完成
 
 用法:
-    python scripts/demo_pipeline.py              # 插入所有案例并查询
-    python scripts/demo_pipeline.py --limit 3    # 只插入前 3 个文档
-    python scripts/demo_pipeline.py --query-only # 跳过插入，直接查询
+    python scripts/demo_pipeline.py                  # 上传所有案例
+    python scripts/demo_pipeline.py --limit 3        # 只上传前 3 篇
+    python scripts/demo_pipeline.py --status-only    # 跳过上传，仅查看处理状态
+    python scripts/demo_pipeline.py --dry-run        # 仅预览，不上传
 """
 
-import json
 import os
 import sys
 import time
@@ -15,170 +21,219 @@ from pathlib import Path
 
 import requests
 
-SERVER = os.getenv("LIGHTSERVER_URL", "http://localhost:8001")
+# ============================================================
+# 配置（可通过环境变量或命令行参数覆盖）
+# ============================================================
+
+APP_SERVER = os.getenv("APP_SERVER", "http://localhost:8000")
+LIGHTSERVER_SERVER = os.getenv("LIGHTSERVER_SERVER", "http://localhost:8001")
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 CASE_DIR = Path(__file__).resolve().parent.parent.parent / "case" / "反诈案例"
 
 
 # ============================================================
-# Phase 1: Insert documents
+# Phase 1: 认证
+# ============================================================
+
+def login(username: str, password: str) -> str:
+    """登录获取 JWT token。"""
+    r = requests.post(
+        f"{APP_SERVER}/api/v1/auth/login",
+        json={"username": username, "password": password},
+        timeout=10,
+    )
+    if r.status_code != 200:
+        detail = r.json().get("detail", "unknown")
+        print(f"登录失败: {detail}")
+        sys.exit(1)
+    return r.json()["access_token"]
+
+
+# ============================================================
+# Phase 2: 收集文档
 # ============================================================
 
 def collect_documents(limit=None):
-    """收集所有案例文档。"""
+    """遍历反诈案例目录，收集所有 .md 文件。"""
     docs = []
     for cat_dir in sorted(CASE_DIR.iterdir()):
         if not cat_dir.is_dir():
             continue
         for f in sorted(cat_dir.glob("*.md")):
-            text = f.read_text(encoding="utf-8")
-            doc_id = f"{cat_dir.name}/{f.stem}"
-            docs.append({"doc_id": doc_id, "text": text, "file_path": str(f)})
+            docs.append({
+                "file_path": f,
+                "category": cat_dir.name,
+                "filename": f.name,
+            })
     if limit:
         docs = docs[:limit]
     return docs
 
 
-def submit_doc(doc):
-    """提交一篇文档到 LightRAG。"""
-    r = requests.post(
-        f"{SERVER}/api/v1/analyze",
-        json={"text": doc["text"], "doc_id": doc["doc_id"], "file_path": doc["file_path"]},
+# ============================================================
+# Phase 3: 上传文档
+# ============================================================
+
+def upload_document(token: str, file_path: Path) -> dict:
+    """通过主应用 API 上传一篇 .md 文档。
+
+    与前端 KnowledgeBase.vue 的 handleUpload 调用方式完全一致。
+    """
+    headers = {"Authorization": f"Bearer {token}"}
+    with open(file_path, "rb") as f:
+        r = requests.post(
+            f"{APP_SERVER}/api/v1/documents/upload",
+            headers=headers,
+            files={"file": (file_path.name, f, "text/markdown")},
+            timeout=60,
+        )
+    if r.status_code == 409:
+        detail = r.json().get("detail", "文件已存在")
+        return {"status": "skipped", "reason": detail}
+    if r.status_code != 200:
+        detail = r.json().get("detail", "上传失败")
+        return {"status": "error", "reason": detail}
+    data = r.json()
+    return {
+        "status": "uploaded",
+        "doc_id": data["id"],
+        "filename": data["filename"],
+    }
+
+
+def list_documents(token: str) -> list[dict]:
+    """获取文档列表及处理状态。"""
+    headers = {"Authorization": f"Bearer {token}"}
+    r = requests.get(
+        f"{APP_SERVER}/api/v1/documents",
+        headers=headers,
+        params={"status": "all", "limit": 100},
+        timeout=10,
     )
-    return r.json().get("task_id")
+    if r.status_code != 200:
+        print(f"获取文档列表失败: {r.text[:200]}")
+        return []
+    return r.json().get("documents", [])
 
 
-def wait_for_tasks(task_ids, timeout=600):
-    """轮询等待所有任务完成。"""
+# ============================================================
+# Phase 4: 等待处理完成
+# ============================================================
+
+def wait_for_completion(token: str, timeout=21600, poll_interval=30):
+    """轮询文档列表，直到所有文档处理完成或超时。"""
     start = time.time()
+    last_status = {}
+    pending = []  # 初始化，避免超时消息引用失败
+
     while time.time() - start < timeout:
-        done = 0
-        for tid in task_ids:
-            r = requests.get(f"{SERVER}/api/v1/status/{tid}")
-            s = r.json().get("status")
-            if s in ("completed", "failed"):
-                done += 1
-        if done == len(task_ids):
-            break
-        remaining = len(task_ids) - done
-        print(f"  等待中... {done}/{len(task_ids)} 完成，{remaining} 处理中")
-        time.sleep(5)
+        docs = list_documents(token)
+        if not docs:
+            print("  暂无文档记录")
+            time.sleep(poll_interval)
+            continue
 
-    # 打印汇总
-    for tid in task_ids:
-        r = requests.get(f"{SERVER}/api/v1/status/{tid}")
-        s = r.json()
-        status = s.get("status")
-        result = s.get("result", {})
-        if status == "completed":
-            entities = result.get("entity_count", 0)
-            relations = result.get("relation_count", 0)
-            print(f"  [OK] {tid[:8]}... entities={entities}, relations={relations}")
-        else:
-            print(f"  [FAIL] {tid[:8]}... {s.get('error', 'unknown')}")
+        pending = [d for d in docs if d["status"] in ("pending", "processing")]
+        completed = [d for d in docs if d["status"] == "completed"]
+        failed = [d for d in docs if d["status"] == "failed"]
+
+        # 状态变化时打印
+        current_status = {d["original_filename"]: d["status"] for d in docs}
+        if current_status != last_status:
+            elapsed = int(time.time() - start)
+            print(f"  [{elapsed}s] 已完成: {len(completed)}, 处理中: {len(pending)}, 失败: {len(failed)}, 总计: {len(docs)}")
+            for d in docs:
+                name = d["original_filename"]
+                status = d["status"]
+                meta = ""
+                if status == "completed":
+                    ec = d.get("entity_count", 0) or 0
+                    rc = d.get("relation_count", 0) or 0
+                    meta = f"  {ec}实体/{rc}关系"
+                elif status == "failed":
+                    meta = f"  {d.get('error_message', '未知错误')}"
+                print(f"    [{status:>10}] {name}{meta}")
+            print()
+
+        if not pending:
+            print(f"  全部文档处理完成（完成: {len(completed)}, 失败: {len(failed)}）")
+            return True
+
+        last_status = current_status
+        time.sleep(poll_interval)
+
+    print(f"  超时（{timeout}s），仍有 {len(pending)} 篇文档在处理中")
+    return False
 
 
 # ============================================================
-# Phase 2: Demo queries
+# Phase 5: 演示查询（可选）
 # ============================================================
 
-def get(path, params=None):
-    r = requests.get(f"{SERVER}{path}", params=params)
-    try:
-        return r.json()
-    except Exception:
-        return {"error": r.text[:300]}
+def demo_queries(token: str):
+    """运行一组演示查询验证知识图谱数据。"""
+    headers = {"Authorization": f"Bearer {token}"}
 
-
-def post(path, data):
-    r = requests.post(f"{SERVER}{path}", json=data)
-    try:
-        return r.json()
-    except Exception:
-        return {"error": r.text[:300]}
-
-
-def truncate(s, n=100):
-    s = str(s)
-    return s[:n] + "..." if len(s) > n else s
-
-
-def demo_queries():
-    """运行一组演示查询。"""
     print("\n" + "=" * 70)
+    print("验证知识图谱数据")
+    print("=" * 70)
 
-    # 1. RAG 问答
-    print("\n[1] RAG 问答 — '这起案件属于哪类诈骗？'")
+    # 1. 查看知识图谱子图
+    print("\n[1] 知识图谱子图")
     print("-" * 70)
-    r = post("/api/v1/retrieval/query", {
-        "question": "这起案件属于哪类诈骗？", "mode": "mix", "top_k": 5
-    })
-    print(f"  回答: {truncate(r.get('answer', ''), 200)}")
-    print()
+    r = requests.get(
+        f"{APP_SERVER}/api/v1/kg/graph",
+        headers=headers,
+        params={"entity_name": "*", "max_depth": 2, "max_nodes": 10},
+        timeout=60,
+    )
+    if r.status_code != 200:
+        print(f"  请求失败: {r.text[:200]}")
+    else:
+        data = r.json()
+        nodes = data.get("nodes", [])
+        edges = data.get("edges", [])
+        print(f"  节点: {data.get('total_nodes', 0)}, 边: {data.get('total_edges', 0)}")
+        for n in nodes[:5]:
+            print(f"    [{n.get('entity_type')}] {n.get('label', '')[:80]}")
+        for e in edges[:5]:
+            print(f"    {e.get('source', '')[:30]} --{e.get('relation_type')}--> {e.get('target', '')[:30]}")
 
-    # 2. 知识图谱
-    print("[2] 知识图谱子图")
+    # 2. 实体类型统计
+    print("\n[2] 按实体类型统计")
     print("-" * 70)
-    r = get("/api/v1/kg/graph", {"entity_name": "*", "max_depth": 2, "max_nodes": 20})
-    nodes = r.get("nodes", [])
-    edges = r.get("edges", [])
-    print(f"  节点: {r.get('total_nodes')}, 边: {r.get('total_edges')}")
-    for n in nodes[:5]:
-        print(f"    [{n.get('entity_type')}] {truncate(n.get('label'), 60)}")
-    for e in edges[:5]:
-        print(f"    {truncate(e.get('source'), 30)} --{e.get('relation_type')}--> {truncate(e.get('target'), 30)}")
-    print()
+    for etype in ["FraudScenario", "FraudMethod", "FraudFeature",
+                   "PreventionMeasure", "LawRegulation", "RelatedCase"]:
+        r = requests.get(
+            f"{LIGHTSERVER_SERVER}/api/v1/retrieval/by-type/{etype}",
+            params={"top_k": 100},
+            timeout=30,
+        )
+        if r.status_code != 200:
+            print(f"  {etype}: 请求失败 ({r.status_code})")
+        else:
+            data = r.json()
+            print(f"  {etype}: {data.get('count', 0)} 条")
 
-    # 3. 图谱标签
-    print("[3] 知识图谱标签")
+    # 3. 相似案例搜索
+    print("\n[3] 相似案例搜索 — '虚假投资理财'")
     print("-" * 70)
-    r = get("/api/v1/kg/labels")
-    labels = r.get("labels", [])
-    print(f"  标签: {labels}")
-    print()
-
-    # 4. BM25 混合检索
-    print("[4] BM25 混合检索 — '虚假投资'")
-    print("-" * 70)
-    r = post("/api/v1/retrieval/bm25", {"question": "虚假投资", "top_k": 3})
-    chunks = r.get("chunks", [])
-    print(f"  找到 {len(chunks)} 个 chunk")
-    for c in chunks[:3]:
-        score = c.get("rrf_score", 0)
-        print(f"    [{score:.4f}] {truncate(c.get('content', ''), 100)}")
-    print()
-
-    # 5. 按实体类型查询
-    print("[5] 按实体类型查询")
-    print("-" * 70)
-    for etype in ["FraudScenario", "FraudMethod", "PreventionMeasure"]:
-        r = get(f"/api/v1/retrieval/by-type/{etype}", {"top_k": 5})
-        items = r.get("items", [])
-        print(f"  {etype}: {r.get('count')} 条")
-        for it in items[:3]:
-            print(f"    - {truncate(it.get('entity_name', ''), 70)}")
-    print()
-
-    # 6. 相似案例搜索
-    print("[6] 相似案例搜索 — '虚假投资理财诈骗'")
-    print("-" * 70)
-    r = get("/api/v1/kg/search", {"q": "虚假投资理财诈骗", "top_k": 3})
-    print(f"  chunks: {len(r.get('chunks', []))}, summaries: {len(r.get('summaries', []))}, cases: {len(r.get('related_cases', []))}")
-    for s in r.get("summaries", [])[:2]:
-        print(f"    案件: {truncate(s.get('entity_name', ''), 80)}")
-    for c in r.get("related_cases", [])[:2]:
-        print(f"    案例: {truncate(c.get('entity_name', ''), 80)}")
-    print()
-
-    # 7. 防范措施
-    print("[7] 防范措施检索 — '投资'")
-    print("-" * 70)
-    r = post("/api/v1/retrieval/prevention", {"query": "投资", "top_k": 5})
-    items = r.get("items", [])
-    print(f"  共 {r.get('count')} 条")
-    for it in items[:5]:
-        print(f"    - {truncate(it.get('entity_name', ''), 70)}")
-        print(f"      {truncate(it.get('description', ''), 100)}")
-    print()
+    r = requests.get(
+        f"{APP_SERVER}/api/v1/kg/search",
+        headers=headers,
+        params={"q": "虚假投资理财", "top_k": 3},
+        timeout=60,
+    )
+    if r.status_code != 200:
+        print(f"  请求失败: {r.text[:200]}")
+    else:
+        data = r.json()
+        for s in data.get("summaries", [])[:3]:
+            name = s.get("entity_name", "")
+            desc = s.get("description", "")
+            print(f"    案件: {name[:70]}")
+            print(f"      {desc[:100]}")
 
 
 # ============================================================
@@ -187,50 +242,99 @@ def demo_queries():
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="LightRAG 端到端演示")
-    parser.add_argument("--limit", type=int, default=None, help="只插入前 N 个文档")
-    parser.add_argument("--query-only", action="store_true", help="跳过插入，直接查询")
-    parser.add_argument("--server", default=None, help="LightRAG 服务地址")
+    parser = argparse.ArgumentParser(description="批量上传反诈案例到知识图谱")
+    parser.add_argument("--limit", type=int, default=None, help="只上传前 N 篇文档")
+    parser.add_argument("--status-only", action="store_true", help="跳过上传，仅查看处理状态")
+    parser.add_argument("--dry-run", action="store_true", help="仅预览文档列表，不上传")
+    parser.add_argument("--timeout", type=int, default=21600, help="等待处理完成的超时秒数（默认 21600=6 小时）")
+    parser.add_argument("--poll-interval", type=int, default=30, help="轮询间隔秒数（默认 30）")
+    parser.add_argument("--no-demo", action="store_true", help="跳过演示查询")
+    parser.add_argument("--server", default=None, help="主应用服务器地址")
+    parser.add_argument("--username", default=None, help="管理员用户名")
+    parser.add_argument("--password", default=None, help="管理员密码")
     args = parser.parse_args()
 
     if args.server:
-        global SERVER
-        SERVER = args.server
+        global APP_SERVER
+        APP_SERVER = args.server
+    if args.username:
+        global ADMIN_USERNAME
+        ADMIN_USERNAME = args.username
+    if args.password:
+        global ADMIN_PASSWORD
+        ADMIN_PASSWORD = args.password
 
-    print(f"LightRAG 服务器: {SERVER}")
+    print("=" * 70)
+    print("反诈案例批量上传工具")
+    print("=" * 70)
+    print(f"  服务器:     {APP_SERVER}")
+    print(f"  案例目录:   {CASE_DIR}")
+    print()
 
     # 检查服务是否可达
     try:
-        r = requests.get(f"{SERVER}/health", timeout=5)
+        r = requests.get(f"{APP_SERVER}/health", timeout=5)
         print(f"健康检查: {r.json()}")
     except Exception as e:
         print(f"无法连接服务器: {e}")
-        print("请先启动服务: cd lightserver && python server.py")
+        print(f"请确保主应用已启动（默认 {APP_SERVER}）")
         sys.exit(1)
 
-    if not args.query_only:
-        print(f"\n数据源: {CASE_DIR}")
-        docs = collect_documents(limit=args.limit)
-        print(f"收集到 {len(docs)} 篇文档")
+    # 收集文档
+    docs = collect_documents(limit=args.limit)
+    print(f"收集到 {len(docs)} 篇文档：")
+    for d in docs:
+        print(f"  [{d['category']}] {d['filename']}")
+    print()
 
-        if not docs:
-            print("没有找到文档，退出。")
-            sys.exit(0)
+    if args.dry_run:
+        print("预览模式，未执行上传。")
+        return
 
-        print("\n正在插入文档...")
-        task_ids = []
-        for i, doc in enumerate(docs):
-            print(f"  提交 {i+1}/{len(docs)}: {doc['doc_id']}")
-            tid = submit_doc(doc)
-            task_ids.append(tid)
-            time.sleep(0.5)  # 避免请求过快
+    # 登录
+    print("正在登录...")
+    token = login(ADMIN_USERNAME, ADMIN_PASSWORD)
+    print("登录成功。\n")
 
-        print(f"\n等待 {len(task_ids)} 个任务完成...")
-        wait_for_tasks(task_ids)
+    # 上传
+    if not args.status_only:
+        print("=" * 70)
+        print("上传文档")
+        print("=" * 70)
 
-    demo_queries()
+        uploaded = 0
+        skipped = 0
+        errors = 0
 
-    print("\n演示完成。")
+        for i, d in enumerate(docs):
+            print(f"  [{i+1}/{len(docs)}] 上传: {d['filename']}", end=" ... ")
+            result = upload_document(token, d["file_path"])
+
+            if result["status"] == "uploaded":
+                print(f"OK (id={result['doc_id'][:8]}...)")
+                uploaded += 1
+            elif result["status"] == "skipped":
+                print(f"跳过 ({result['reason']})")
+                skipped += 1
+            else:
+                print(f"失败 ({result['reason']})")
+                errors += 1
+
+            time.sleep(0.3)  # 避免请求过快
+
+        print(f"\n上传完成: {uploaded} 篇成功, {skipped} 篇跳过, {errors} 篇失败\n")
+
+    # 等待处理完成
+    print("=" * 70)
+    print("等待后台处理（lightserver 解析 -> Neo4j/Qdrant 写入）")
+    print("=" * 70)
+    wait_for_completion(token, timeout=args.timeout, poll_interval=args.poll_interval)
+
+    # 演示查询验证
+    if not args.no_demo:
+        demo_queries(token)
+
+    print("\n全部完成。")
 
 
 if __name__ == "__main__":

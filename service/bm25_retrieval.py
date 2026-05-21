@@ -45,7 +45,11 @@ class BM25RetrievalService:
     def ensure_sparse_index(self):
         """尝试配置 BM25 sparse vector 索引。
 
-        若配置失败（版本不兼容 / collection 不支持），则降级为纯 dense 检索。
+        若配置失败（版本不兼容 / collection 不支持动态添加），则降级为纯 dense 检索。
+
+        注意：Qdrant >= 1.7.0 才支持动态添加 sparse vector 配置。
+        低版本 Qdrant 创建 collection 时如果未预配 sparse vector，
+        后续无法通过 update_collection 添加，此时自动降级。
         """
         from qdrant_client import models
 
@@ -82,7 +86,13 @@ class BM25RetrievalService:
                 f"  [BM25] 已为 '{self._collection_name}' 创建 BM25 sparse vector 索引"
             )
         except Exception as e:
-            logger.info("BM25 sparse vector 索引不可用（Qdrant 不支持动态添加 sparse vector），降级为纯 dense 检索: %s", e)
+            error_msg = str(e).lower()
+            # 已知 Qdrant 不支持动态添加 sparse vector 时，静默降级
+            if "sparse vector" in error_msg or "not existing vector name" in error_msg:
+                logger.debug(
+                    "BM25 sparse vector 不可用（Qdrant 版本不支持动态添加 sparse vector）: %s", e)
+            else:
+                logger.warning("BM25 sparse vector 配置异常，降级为纯 dense 检索: %s", e)
             self._sparse_enabled = False
             print(
                 f"  [BM25] sparse vector 索引不可用，将使用纯 dense 向量检索"

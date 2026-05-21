@@ -5,6 +5,7 @@
 1. 精确字符串匹配去重（由调用方完成）
 2. 对新实体计算 embedding，与已有同类型实体做余弦相似度比较
 3. 超过阈值则自动调用 rag.amerge_entities() 合并
+4. 合并成功后同步更新 full_entities / full_relations 追踪数据
 
 复用 LightRAG 库已有能力：
 - entities_vdb.query(query_embedding=...) 做向量相似度搜索
@@ -165,7 +166,155 @@ class EntityDisambiguationService:
                 ),
             )
             logger.info("实体消歧: 合并成功，'%s' 已并入 '%s'", source_entity, entity_name)
+
+            # 合并成功后同步更新 full_entities 和 full_relations 追踪
+            try:
+                _run_async_on_rag(
+                    self.rag,
+                    self._update_tracking_after_merge(source_entity, entity_name),
+                )
+            except Exception as e:
+                logger.warning("实体消歧: 合并追踪更新失败 (%s)，不影响删除正确性", e)
+
             return True
         except Exception as e:
             logger.warning("实体消歧: 合并失败 (%s)，保留两个独立实体", e)
             return False
+
+    async def _update_tracking_after_merge(self, old_name: str, new_name: str):
+        """合并后更新 full_entities 和 full_relations 中的实体名称引用。
+
+        遍历所有文档的 full_entities 条目，将已删除的旧实体名替换为
+        合并后的新实体名，确保删除文档时不会出现 stale 引用。
+
+        Args:
+            old_name: 被合并的源实体名称（已从图谱删除）
+            new_name: 合并后的目标实体名称（保留在图谱中）
+        """
+        # 获取所有存在 full_entities 条目的文档 ID
+        # 通过扫描 entity_chunks 中的 chunk source_ids 来发现相关文档
+        # 这里用更简单的方式：遍历 doc_status 中所有文档
+        try:
+            doc_status_counts = await self.rag.doc_status.get_all_status_counts()
+            # get_all_status_counts 返回 {status: count}，不包含 doc_id
+            # 需要换一种方式：尝试从 full_entities 的存储中发现所有 doc_id
+            # 使用 Redis SCAN 直接扫描 full_entities 命名空间下的所有 key
+            await self._rename_entity_in_full_entities(old_name, new_name)
+            await self._rename_entity_in_full_relations(old_name, new_name)
+        except Exception as e:
+            logger.warning("遍历文档状态失败: %s", e)
+
+    async def _rename_entity_in_full_entities(self, old_name: str, new_name: str):
+        """将 full_entities 中所有包含旧实体名的条目更新为新实体名。"""
+        storage = self.rag.full_entities
+        # Redis KV storage 的 key 模式: {final_namespace}:{doc_id}
+        # 通过 filter_keys 无法枚举，需要直接访问 Redis
+        # 但 BaseKVStorage 不提供 enumerate，我们用另一种方式：
+        # 利用 entity_chunks 存储来发现哪些文档引用了旧实体名
+        try:
+            if self.rag.entity_chunks:
+                # 检查旧实体名在 entity_chunks 中是否有记录
+                old_chunks = await self.rag.entity_chunks.get_by_id(old_name)
+                if old_chunks:
+                    # 旧实体仍有 chunk 记录，说明合并时 chunk_ids 已迁移
+                    # 这些 chunk 对应的 source_id 就是相关文档
+                    # 但 entity_chunks 只存 chunk_ids，不存 doc_id
+                    # 所以这里无法直接获取 doc_id
+                    pass
+        except Exception:
+            pass
+
+        # 最可靠的方式：直接在 Redis 中扫描 full_entities 命名空间
+        # 由于我们在使用 RedisKVStorage，可以访问底层 Redis
+        try:
+            redis_conn = self._get_redis_connection()
+            if redis_conn is None:
+                return
+
+            final_ns = getattr(storage, "final_namespace", "full_entities")
+            pattern = f"{final_ns}:*"
+            cursor = 0
+            while True:
+                cursor, keys = await redis_conn.scan(cursor, match=pattern, count=100)
+                for key in keys:
+                    if isinstance(key, bytes):
+                        key = key.decode("utf-8")
+                    data_str = await redis_conn.get(key)
+                    if not data_str:
+                        continue
+                    import json
+                    data = json.loads(data_str)
+                    entity_names = data.get("entity_names", [])
+                    if old_name in entity_names:
+                        entity_names.remove(old_name)
+                        if new_name not in entity_names:
+                            entity_names.append(new_name)
+                        data["entity_names"] = entity_names
+                        data["count"] = len(entity_names)
+                        await redis_conn.set(key, json.dumps(data, ensure_ascii=False))
+                        # 从 key 中提取 doc_id 用于日志
+                        doc_id = key.split(":", 1)[-1] if ":" in key else key
+                        logger.info(
+                            "full_entities 追踪更新: 文档 %s 的实体 '%s' → '%s'",
+                            doc_id, old_name, new_name,
+                        )
+                if cursor == 0:
+                    break
+        except Exception as e:
+            logger.warning("Redis 扫描更新 full_entities 失败: %s", e)
+
+    async def _rename_entity_in_full_relations(self, old_name: str, new_name: str):
+        """将 full_relations 中所有包含旧实体名的关系对更新为新实体名。"""
+        storage = self.rag.full_relations
+        try:
+            redis_conn = self._get_redis_connection()
+            if redis_conn is None:
+                return
+
+            final_ns = getattr(storage, "final_namespace", "full_relations")
+            pattern = f"{final_ns}:*"
+            cursor = 0
+            while True:
+                cursor, keys = await redis_conn.scan(cursor, match=pattern, count=100)
+                for key in keys:
+                    if isinstance(key, bytes):
+                        key = key.decode("utf-8")
+                    data_str = await redis_conn.get(key)
+                    if not data_str:
+                        continue
+                    import json
+                    data = json.loads(data_str)
+                    relation_pairs = data.get("relation_pairs", [])
+                    changed = False
+                    for pair in relation_pairs:
+                        if isinstance(pair, list) and len(pair) >= 2:
+                            if pair[0] == old_name:
+                                pair[0] = new_name
+                                changed = True
+                            if pair[1] == old_name:
+                                pair[1] = new_name
+                                changed = True
+                    if changed:
+                        data["relation_pairs"] = relation_pairs
+                        data["count"] = len(relation_pairs)
+                        await redis_conn.set(key, json.dumps(data, ensure_ascii=False))
+                        doc_id = key.split(":", 1)[-1] if ":" in key else key
+                        logger.info(
+                            "full_relations 追踪更新: 文档 %s 的关系中 '%s' → '%s'",
+                            doc_id, old_name, new_name,
+                        )
+                if cursor == 0:
+                    break
+        except Exception as e:
+            logger.warning("Redis 扫描更新 full_relations 失败: %s", e)
+
+    def _get_redis_connection(self):
+        """获取 Redis 连接（用于 SCAN 操作）。"""
+        try:
+            storage = self.rag.full_entities
+            # RedisKVStorage 有 _redis 属性
+            if hasattr(storage, "_redis"):
+                return storage._redis
+        except Exception:
+            pass
+        return None
