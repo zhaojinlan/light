@@ -118,7 +118,49 @@ def list_documents(token: str) -> list[dict]:
 
 
 # ============================================================
-# Phase 4: 等待处理完成
+# Phase 4: 重试失败文档
+# ============================================================
+
+def retry_failed_documents(token: str):
+    """查询所有 failed 状态的文档，调用 retry API 将其重置为 pending。"""
+    headers = {"Authorization": f"Bearer {token}"}
+    r = requests.get(
+        f"{APP_SERVER}/api/v1/documents",
+        headers=headers,
+        params={"status": "failed", "limit": 100},
+        timeout=10,
+    )
+    if r.status_code != 200:
+        print(f"  查询失败文档失败: {r.text[:200]}")
+        return 0
+
+    failed_docs = r.json().get("documents", [])
+    if not failed_docs:
+        print("  没有失败的文档")
+        return 0
+
+    print(f"  发现 {len(failed_docs)} 篇失败文档，正在重置...")
+    retried = 0
+    for doc in failed_docs:
+        doc_id = doc["id"]
+        name = doc["original_filename"]
+        r = requests.put(
+            f"{APP_SERVER}/api/v1/documents/{doc_id}/retry",
+            headers=headers,
+            timeout=10,
+        )
+        if r.status_code == 200:
+            print(f"    [已重置] {name}")
+            retried += 1
+        else:
+            detail = r.json().get("detail", "未知错误")
+            print(f"    [失败] {name}: {detail}")
+        time.sleep(0.2)
+    return retried
+
+
+# ============================================================
+# Phase 5: 等待处理完成
 # ============================================================
 
 def wait_for_completion(token: str, timeout=21600, poll_interval=30):
@@ -168,7 +210,7 @@ def wait_for_completion(token: str, timeout=21600, poll_interval=30):
 
 
 # ============================================================
-# Phase 5: 演示查询（可选）
+# Phase 6: 演示查询（可选）
 # ============================================================
 
 def demo_queries(token: str):
@@ -249,6 +291,7 @@ def main():
     parser.add_argument("--timeout", type=int, default=21600, help="等待处理完成的超时秒数（默认 21600=6 小时）")
     parser.add_argument("--poll-interval", type=int, default=30, help="轮询间隔秒数（默认 30）")
     parser.add_argument("--no-demo", action="store_true", help="跳过演示查询")
+    parser.add_argument("--retry-failed", action="store_true", help="将失败文档重置为 pending 后重新处理")
     parser.add_argument("--server", default=None, help="主应用服务器地址")
     parser.add_argument("--username", default=None, help="管理员用户名")
     parser.add_argument("--password", default=None, help="管理员密码")
@@ -295,6 +338,14 @@ def main():
     print("正在登录...")
     token = login(ADMIN_USERNAME, ADMIN_PASSWORD)
     print("登录成功。\n")
+
+    # 重试失败文档
+    if args.retry_failed:
+        print("=" * 70)
+        print("重试失败文档")
+        print("=" * 70)
+        retry_failed_documents(token)
+        print()
 
     # 上传
     if not args.status_only:
