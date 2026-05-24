@@ -505,6 +505,62 @@ async def retrieval_prevention(req: PreventionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ============================================================
+# 图遍历端点 — 邻居探索 / 最短路径
+# ============================================================
+
+
+@app.get("/api/v1/kg/entity/{entity_name}/neighbors")
+async def get_kg_entity_neighbors(entity_name: str, depth: int = 1):
+    """获取实体的 N 跳邻居节点（用于多跳图遍历推理）。
+
+    Args:
+        entity_name: 实体名称（精确匹配）
+        depth: 搜索深度（跳数），1=直接邻居，2=邻居的邻居。默认 1
+    """
+    from service.query_service import QueryService
+
+    svc = QueryService(rag=app.state.rag)
+    try:
+        if not (1 <= depth <= 4):
+            raise HTTPException(status_code=400, detail="depth must be between 1 and 4")
+        result = svc.get_entity_neighbors(entity_name, depth=depth)
+        if not result:
+            raise HTTPException(status_code=404, detail=f"Entity '{entity_name}' not found")
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("KG neighbors error for %s: %s", entity_name, e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v1/kg/shortest-path")
+async def get_kg_shortest_path(src: str, tgt: str, max_depth: int = 4):
+    """查找两个实体之间的最短关系路径（用于关联链路推理）。
+
+    Args:
+        src: 起始实体名称
+        tgt: 目标实体名称
+        max_depth: 最大搜索深度（边数），默认 4
+    """
+    from service.query_service import QueryService
+
+    svc = QueryService(rag=app.state.rag)
+    try:
+        if not (1 <= max_depth <= 6):
+            raise HTTPException(status_code=400, detail="max_depth must be between 1 and 6")
+        result = svc.get_shortest_path(src, tgt, max_depth=max_depth)
+        if not result:
+            return {"nodes": [], "edges": [], "message": f"No path found between '{src}' and '{tgt}'"}
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("KG shortest-path error: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
 

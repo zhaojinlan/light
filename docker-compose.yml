@@ -60,6 +60,8 @@ services:
       - REDIS_URI=redis://host.docker.internal:6379/0
     volumes:
       - ./rag_storage:/app/rag_storage
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       neo4j:
         condition: service_healthy

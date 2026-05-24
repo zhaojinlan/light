@@ -302,11 +302,22 @@ def main():
         print("上传文档")
         print("=" * 70)
 
+        # 预检：查询已存在的文档，跳过无需上传的文件
+        existing_docs = list_documents(token)
+        existing_names = {d["original_filename"] for d in existing_docs}
+        if existing_names:
+            print(f"已存在 {len(existing_names)} 篇文档，将跳过重复上传\n")
+
         uploaded = 0
         skipped = 0
         errors = 0
 
         for i, d in enumerate(docs):
+            if d["filename"] in existing_names:
+                print(f"  [{i+1}/{len(docs)}] 跳过: {d['filename']} (已存在)")
+                skipped += 1
+                continue
+
             print(f"  [{i+1}/{len(docs)}] 上传: {d['filename']}", end=" ... ")
             result = upload_document(token, d["file_path"])
 
