@@ -13,6 +13,9 @@ services:
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_trigger_enabled=true
       - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=1g
+      - NEO4J_dbms_memory_pagecache_size=1g
     volumes:
       - neo4j_data:/data
       - neo4j_logs:/logs
@@ -25,6 +28,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 20
+    deploy:
+      resources:
+        limits:
+          memory: 3G
 
   # Qdrant — 向量数据库
   qdrant:
@@ -44,6 +51,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 2G
 
   # LightRAG HTTP 服务
   lightserver:
@@ -74,6 +85,10 @@ services:
       retries: 5
     networks:
       - lightrag-net
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
 volumes:
   neo4j_data:

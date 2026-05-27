@@ -30,8 +30,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 # ============================================================
 
 REDIS_DOC_STREAM = os.getenv("REDIS_DOC_STREAM", "doc:result")
+REDIS_STREAM_MAXLEN = 10000  # 防止 Stream 无限增长
+DOC_IMPORT_CONCURRENCY = 5  # 同时处理文档的上限
 
 _redis: Redis | None = None
+_doc_sem = asyncio.Semaphore(DOC_IMPORT_CONCURRENCY)
 
 
 async def _get_redis() -> Redis:
@@ -124,7 +127,11 @@ async def analyze(req: AnalyzeRequest):
     """提交文档到 LightRAG 进行知识图谱构建。
 
     处理完成后通过 Redis Stream "doc:result" 异步回调结果。
+    并发数受限于 DOC_IMPORT_CONCURRENCY（默认 5），超限时返回 503。
     """
+    if _doc_sem.locked():
+        raise HTTPException(status_code=503, detail="文档处理队列已满，请稍后重试")
+
     task_id = str(uuid.uuid4())
 
     # 在后台执行耗时的 insert 操作
@@ -147,7 +154,7 @@ async def _push_to_redis_stream(fields: dict, max_retries: int = 3) -> None:
     for attempt in range(max_retries):
         try:
             redis = await _get_redis()
-            await redis.xadd(REDIS_DOC_STREAM, fields)
+            await redis.xadd(REDIS_DOC_STREAM, fields, maxlen=REDIS_STREAM_MAXLEN, approximate=True)
             return
         except Exception as e:
             last_error = e
@@ -161,53 +168,54 @@ async def _push_to_redis_stream(fields: dict, max_retries: int = 3) -> None:
 
 async def _run_insert(task_id: str, text: str, doc_id: str, file_path: str):
     """在后台执行 LightRAG insert 操作，完成后通过 Redis Stream 推送结果。"""
-    try:
-        def _insert_sync():
-            from service.custom_entity_service import CustomEntityService
-
-            svc = CustomEntityService(rag=app.state.rag)
-            result = svc.insert_with_custom_schema(
-                text=text,
-                doc_id=doc_id,
-                file_path=file_path if file_path else "custom_kg",
-            )
-            return {
-                "track_id": result.get("doc_id", doc_id),
-                "entity_count": len(result.get("entities", [])),
-                "relation_count": len(result.get("relationships", [])),
-            }
-
-        # 在线程池中执行同步的 insert
-        insert_result = await asyncio.to_thread(_insert_sync)
-
-        track_id = insert_result.get("track_id", doc_id)
-        entity_count = insert_result.get("entity_count", 0)
-        relation_count = insert_result.get("relation_count", 0)
-
-        logger.info("Task %s completed: track_id=%s, entities=%d, relations=%d",
-                    task_id, track_id, entity_count, relation_count)
-
-        # 推送结果到 Redis Stream（带重试）
-        await _push_to_redis_stream({
-            "task_id": task_id,
-            "status": "completed",
-            "entity_count": str(entity_count),
-            "relation_count": str(relation_count),
-        })
-        logger.info("Result pushed to Redis Stream '%s'", REDIS_DOC_STREAM)
-
-    except Exception as e:
-        logger.error("Task %s failed: %s", task_id, e, exc_info=True)
-
-        # 推送失败结果到 Redis Stream（带重试）
+    async with _doc_sem:
         try:
+            def _insert_sync():
+                from service.custom_entity_service import CustomEntityService
+
+                svc = CustomEntityService(rag=app.state.rag)
+                result = svc.insert_with_custom_schema(
+                    text=text,
+                    doc_id=doc_id,
+                    file_path=file_path if file_path else "custom_kg",
+                )
+                return {
+                    "track_id": result.get("doc_id", doc_id),
+                    "entity_count": len(result.get("entities", [])),
+                    "relation_count": len(result.get("relationships", [])),
+                }
+
+            # 在线程池中执行同步的 insert
+            insert_result = await asyncio.to_thread(_insert_sync)
+
+            track_id = insert_result.get("track_id", doc_id)
+            entity_count = insert_result.get("entity_count", 0)
+            relation_count = insert_result.get("relation_count", 0)
+
+            logger.info("Task %s completed: track_id=%s, entities=%d, relations=%d",
+                        task_id, track_id, entity_count, relation_count)
+
+            # 推送结果到 Redis Stream（带重试）
             await _push_to_redis_stream({
                 "task_id": task_id,
-                "status": "failed",
-                "error": str(e),
+                "status": "completed",
+                "entity_count": str(entity_count),
+                "relation_count": str(relation_count),
             })
-        except Exception as redis_err:
-            logger.critical("无法推送失败结果到 Redis，文档 %s 将永久卡在 processing: %s", task_id, redis_err)
+            logger.info("Result pushed to Redis Stream '%s'", REDIS_DOC_STREAM)
+
+        except Exception as e:
+            logger.error("Task %s failed: %s", task_id, e, exc_info=True)
+
+            # 推送失败结果到 Redis Stream（带重试）
+            try:
+                await _push_to_redis_stream({
+                    "task_id": task_id,
+                    "status": "failed",
+                    "error": str(e),
+                })
+            except Exception as redis_err:
+                logger.critical("无法推送失败结果到 Redis，文档 %s 将永久卡在 processing: %s", task_id, redis_err)
 
 
 @app.post("/api/v1/doc/set-isanalysis")
