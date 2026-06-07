@@ -3,9 +3,11 @@ FROM python:3.10-slim
 WORKDIR /app
 
 COPY requirements.txt .
-# 连不上用阿里的
-#RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
-RUN pip install --no-cache-dir -r requirements.txt 
+# 优先使用阿里云镜像（国内加速），只用预编译 wheel 避免源码编译
+RUN pip install --no-cache-dir --default-timeout=120 --retries 5 \
+    --only-binary :all: \
+    -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
+    -r requirements.txt
 # Pre-bundle tiktoken cache at the correct location tiktoken checks
 # On Linux, tiktoken defaults to /tmp/data-gym-cache/
 RUN mkdir -p /tmp/data-gym-cache
